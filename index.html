@@ -4,1357 +4,282 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="theme-color" content="#0b1220">
-<title>AstroCare Medical Centre</title>
-
+<title>AstroCare Medical Centre | Doctor Portal</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
 <style>
-:root {
-  --bg:#0b1220;
-  --panel:#121d2d;
-  --panel2:#172438;
-  --line:#26364b;
-  --text:#eef4fb;
-  --muted:#91a3b8;
-  --blue:#38bdf8;
-  --cyan:#06b6d4;
-  --green:#10b981;
-  --amber:#f59e0b;
-  --red:#ef4444;
-  --radius:16px;
-}
-
-* {
-  box-sizing:border-box;
-}
-
-body {
-  margin:0;
-  background:var(--bg);
-  color:var(--text);
-  font-family:Inter,system-ui,-apple-system,"Segoe UI",sans-serif;
-}
-
-button,input {
-  font:inherit;
-}
-
-button {
-  cursor:pointer;
-}
-
-.hidden {
-  display:none!important;
-}
-
-/* LOGIN */
-
-#loginScreen {
-  min-height:100vh;
-  display:grid;
-  place-items:center;
-  padding:24px;
-  background:
-    radial-gradient(circle at 80% 10%,rgba(6,182,212,.12),transparent 30%),
-    radial-gradient(circle at 10% 90%,rgba(56,189,248,.1),transparent 30%),
-    var(--bg);
-}
-
-.login-card {
-  width:min(440px,100%);
-  background:var(--panel);
-  border:1px solid var(--line);
-  border-radius:22px;
-  padding:32px;
-  box-shadow:0 18px 50px rgba(0,0,0,.25);
-}
-
-.brand-mark {
-  width:48px;
-  height:48px;
-  border-radius:14px;
-  background:linear-gradient(135deg,#0ea5e9,#06b6d4);
-  display:grid;
-  place-items:center;
-  font-size:23px;
-  margin-bottom:20px;
-}
-
-.eyebrow {
-  color:var(--cyan);
-  font-size:11px;
-  font-weight:800;
-  letter-spacing:1.7px;
-  text-transform:uppercase;
-}
-
-h1,h2,h3,p {
-  margin-top:0;
-}
-
-h1 {
-  font-size:25px;
-  margin-bottom:8px;
-}
-
-h2 {
-  font-size:20px;
-}
-
-.muted {
-  color:var(--muted);
-}
-
-.small {
-  font-size:12px;
-  line-height:1.6;
-}
-
-.field {
-  display:grid;
-  gap:7px;
-  margin:16px 0;
-}
-
-.field label {
-  font-size:12px;
-  color:#b8c7d8;
-  font-weight:700;
-}
-
-.field input {
-  width:100%;
-  background:#0b1524;
-  color:var(--text);
-  border:1px solid var(--line);
-  border-radius:10px;
-  padding:12px 13px;
-  outline:none;
-}
-
-.field input:focus {
-  border-color:var(--blue);
-}
-
-.btn {
-  border:0;
-  border-radius:10px;
-  padding:11px 15px;
-  font-weight:750;
-}
-
-.btn-primary {
-  background:var(--blue);
-  color:#062033;
-}
-
-.btn-quiet {
-  background:#203149;
-  color:#dce9f7;
-  border:1px solid #31445d;
-}
-
-.btn-block {
-  width:100%;
-  margin-top:8px;
-}
-
-.notice {
-  padding:12px;
-  border:1px solid rgba(245,158,11,.28);
-  background:rgba(245,158,11,.08);
-  color:#fbd38d;
-  border-radius:10px;
-  font-size:12px;
-  line-height:1.55;
-  margin-top:16px;
-}
-
-.error {
-  color:#fca5a5;
-  font-size:12px;
-  margin-top:12px;
-  line-height:1.5;
-}
-
-/* MAIN APPLICATION */
-
-#app {
-  min-height:100vh;
-}
-
-.topbar {
-  height:68px;
-  border-bottom:1px solid var(--line);
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  padding:0 25px;
-  background:#0d1726;
-  position:sticky;
-  top:0;
-  z-index:5;
-}
-
-.topbrand {
-  display:flex;
-  align-items:center;
-  gap:12px;
-  font-weight:800;
-}
-
-.mini-mark {
-  width:36px;
-  height:36px;
-  border-radius:11px;
-  background:linear-gradient(135deg,#0ea5e9,#06b6d4);
-  display:grid;
-  place-items:center;
-}
-
-.top-actions {
-  display:flex;
-  align-items:center;
-  gap:12px;
-}
-
-.connection {
-  font-size:11px;
-  color:var(--green);
-}
-
-.layout {
-  display:grid;
-  grid-template-columns:240px minmax(0,1fr);
-  min-height:calc(100vh - 68px);
-}
-
-.sidebar {
-  border-right:1px solid var(--line);
-  padding:22px 14px;
-  background:#0d1726;
-}
-
-.side-label {
-  font-size:10px;
-  color:#6f8299;
-  font-weight:800;
-  letter-spacing:1.5px;
-  padding:12px;
-}
-
-.nav-btn {
-  width:100%;
-  display:flex;
-  align-items:center;
-  gap:12px;
-  border:0;
-  background:transparent;
-  color:#9fb0c4;
-  padding:11px 12px;
-  border-radius:10px;
-  text-align:left;
-  margin:2px 0;
-  font-size:13px;
-  font-weight:650;
-}
-
-.nav-btn:hover,
-.nav-btn.active {
-  background:#1a2b40;
-  color:#eaf6ff;
-}
-
-.nav-btn.active {
-  box-shadow:inset 3px 0 var(--blue);
-}
-
-.nav-icon {
-  width:20px;
-  text-align:center;
-}
-
-.main {
-  padding:28px;
-  max-width:1500px;
-  width:100%;
-  margin:0 auto;
-}
-
-.page-head {
-  display:flex;
-  justify-content:space-between;
-  align-items:flex-start;
-  gap:16px;
-  margin-bottom:24px;
-}
-
-.page-head h1 {
-  font-size:25px;
-  margin:5px 0 7px;
-}
-
-.page-head p {
-  color:var(--muted);
-  font-size:13px;
-}
-
-.grid {
-  display:grid;
-  gap:16px;
-}
-
-.stats {
-  grid-template-columns:repeat(4,minmax(0,1fr));
-  margin-bottom:20px;
-}
-
-.card {
-  background:var(--panel);
-  border:1px solid var(--line);
-  border-radius:var(--radius);
-  padding:18px;
-  box-shadow:0 18px 50px rgba(0,0,0,.15);
-}
-
-.stat-top {
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  color:var(--muted);
-  font-size:12px;
-}
-
-.stat-value {
-  font-size:29px;
-  font-weight:800;
-  margin:12px 0 5px;
-}
-
-.stat-note {
-  font-size:11px;
-  color:var(--muted);
-}
-
-.stat-icon {
-  width:36px;
-  height:36px;
-  border-radius:11px;
-  display:grid;
-  place-items:center;
-  background:#1d334b;
-}
-
-.two-col {
-  grid-template-columns:minmax(0,1.4fr) minmax(280px,.9fr);
-}
-
-.section-head {
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  margin-bottom:15px;
-}
-
-.section-head h2 {
-  font-size:15px;
-  margin:0;
-}
-
-.list {
-  display:grid;
-  gap:10px;
-}
-
-.list-row {
-  display:flex;
-  align-items:center;
-  gap:12px;
-  padding:12px;
-  border:1px solid #26374c;
-  border-radius:12px;
-  background:#142136;
-}
-
-.avatar {
-  width:38px;
-  height:38px;
-  border-radius:12px;
-  background:#25415b;
-  color:#c7efff;
-  display:grid;
-  place-items:center;
-  font-weight:800;
-}
-
-.person strong {
-  font-size:12px;
-  display:block;
-}
-
-.person span {
-  font-size:11px;
-  color:var(--muted);
-  display:block;
-  margin-top:4px;
-}
-
-.badge {
-  font-size:10px;
-  font-weight:800;
-  padding:5px 8px;
-  border-radius:30px;
-}
-
-.badge-blue {
-  background:rgba(56,189,248,.14);
-  color:#7dd3fc;
-}
-
-.badge-amber {
-  background:rgba(245,158,11,.14);
-  color:#fcd38a;
-}
-
-.empty {
-  padding:28px;
-  text-align:center;
-  color:var(--muted);
-  font-size:12px;
-  border:1px dashed #34465c;
-  border-radius:12px;
-}
-
-.callout {
-  border:1px solid rgba(56,189,248,.25);
-  background:rgba(56,189,248,.07);
-  padding:14px;
-  border-radius:12px;
-  font-size:12px;
-  color:#c5eaff;
-  line-height:1.6;
-}
-
-.footer-note {
-  font-size:10px;
-  color:#73869d;
-  margin-top:18px;
-  line-height:1.6;
-}
-
-#toast {
-  position:fixed;
-  right:22px;
-  bottom:22px;
-  background:#17314a;
-  border:1px solid #31506c;
-  color:#e7f7ff;
-  padding:12px 16px;
-  border-radius:11px;
-  font-size:12px;
-  z-index:20;
-}
-
-@media(max-width:1000px) {
-  .stats {
-    grid-template-columns:repeat(2,1fr);
-  }
-
-  .two-col {
-    grid-template-columns:1fr;
-  }
-}
-
-@media(max-width:720px) {
-  .topbar {
-    padding:0 14px;
-  }
-
-  .layout {
-    grid-template-columns:1fr;
-  }
-
-  .sidebar {
-    display:flex;
-    overflow:auto;
-    padding:9px;
-    border-right:0;
-    border-bottom:1px solid var(--line);
-    gap:4px;
-  }
-
-  .side-label {
-    display:none;
-  }
-
-  .nav-btn {
-    width:auto;
-    white-space:nowrap;
-    padding:10px;
-  }
-
-  .main {
-    padding:19px 14px;
-  }
-
-  .page-head {
-    display:block;
-  }
-
-  .page-head .btn {
-    margin-top:14px;
-  }
-}
+:root{
+  --bg:#0b1220;--panel:#121d2d;--panel2:#172438;--line:#26364b;
+  --text:#eef4fb;--muted:#91a3b8;--blue:#38bdf8;--cyan:#06b6d4;
+  --green:#10b981;--amber:#f59e0b;--red:#ef4444;--purple:#a78bfa;
+  --shadow:0 18px 50px rgba(0,0,0,.22);--radius:16px
+}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font-family:Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif}
+button,input,textarea,select{font:inherit}button{cursor:pointer}
+.hidden{display:none!important}
+#loginScreen{min-height:100vh;display:grid;place-items:center;padding:24px;background:radial-gradient(circle at 80% 10%,rgba(6,182,212,.12),transparent 30%),radial-gradient(circle at 10% 90%,rgba(56,189,248,.1),transparent 30%),var(--bg)}
+.login-card{width:min(440px,100%);background:rgba(18,29,45,.96);border:1px solid var(--line);border-radius:22px;padding:32px;box-shadow:var(--shadow)}
+.brand-mark{width:48px;height:48px;border-radius:14px;background:linear-gradient(135deg,#0ea5e9,#06b6d4);display:grid;place-items:center;font-size:23px;margin-bottom:20px}
+.eyebrow{color:var(--cyan);font-size:11px;font-weight:800;letter-spacing:1.7px;text-transform:uppercase}
+h1,h2,h3,p{margin-top:0}h1{font-size:25px;margin-bottom:8px}h2{font-size:21px}h3{font-size:15px}
+.muted{color:var(--muted)}.small{font-size:12px;line-height:1.6}
+.field{display:grid;gap:7px;margin:16px 0}.field label{font-size:12px;color:#b8c7d8;font-weight:700}
+.field input,.field textarea,.field select{width:100%;background:#0b1524;color:var(--text);border:1px solid var(--line);border-radius:10px;padding:12px 13px;outline:none}
+.field input:focus,.field textarea:focus{border-color:var(--blue);box-shadow:0 0 0 3px rgba(56,189,248,.1)}
+.btn{border:0;border-radius:10px;padding:11px 15px;font-weight:750;transition:.15s}
+.btn-primary{background:var(--blue);color:#062033}.btn-primary:hover{filter:brightness(1.08)}
+.btn-quiet{background:#203149;color:#dce9f7;border:1px solid #31445d}
+.btn-danger{background:rgba(239,68,68,.13);color:#fca5a5;border:1px solid rgba(239,68,68,.3)}
+.btn-block{width:100%;margin-top:8px}
+.notice{padding:12px 13px;border:1px solid rgba(245,158,11,.28);background:rgba(245,158,11,.08);color:#fbd38d;border-radius:10px;font-size:12px;line-height:1.55;margin-top:16px}
+.error{color:#fca5a5;font-size:12px;margin-top:12px;line-height:1.5}
+#app{min-height:100vh}.topbar{height:68px;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;padding:0 25px;background:#0d1726;position:sticky;top:0;z-index:5}
+.topbrand{display:flex;align-items:center;gap:12px;font-weight:800}.mini-mark{width:36px;height:36px;border-radius:11px;background:linear-gradient(135deg,#0ea5e9,#06b6d4);display:grid;place-items:center}
+.top-actions{display:flex;align-items:center;gap:12px}.connection{font-size:11px;color:var(--green);display:flex;align-items:center;gap:7px}.dot{width:7px;height:7px;border-radius:50%;background:currentColor}
+.layout{display:grid;grid-template-columns:240px minmax(0,1fr);min-height:calc(100vh - 68px)}
+.sidebar{border-right:1px solid var(--line);padding:22px 14px;background:#0d1726}
+.side-label{font-size:10px;color:#6f8299;font-weight:800;letter-spacing:1.5px;padding:12px 12px 8px}
+.nav-btn{width:100%;display:flex;align-items:center;gap:12px;border:0;background:transparent;color:#9fb0c4;padding:11px 12px;border-radius:10px;text-align:left;margin:2px 0;font-size:13px;font-weight:650}
+.nav-btn:hover,.nav-btn.active{background:#1a2b40;color:#eaf6ff}.nav-btn.active{box-shadow:inset 3px 0 var(--blue)}
+.nav-icon{width:20px;text-align:center;font-size:16px}
+.sidebar-bottom{margin-top:35px;padding:13px;border:1px solid var(--line);border-radius:12px;background:#111e30}
+.main{padding:28px;max-width:1500px;width:100%;margin:0 auto}
+.page-head{display:flex;justify-content:space-between;align-items:flex-start;gap:16px;margin-bottom:24px}
+.page-head h1{font-size:25px;margin:5px 0 7px}.page-head p{color:var(--muted);font-size:13px;margin:0}
+.grid{display:grid;gap:16px}.stats{grid-template-columns:repeat(4,minmax(0,1fr));margin-bottom:20px}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);padding:18px;box-shadow:var(--shadow)}
+.stat-top{display:flex;justify-content:space-between;align-items:center;color:var(--muted);font-size:12px}
+.stat-value{font-size:29px;font-weight:800;margin:12px 0 5px}.stat-note{font-size:11px;color:var(--muted)}
+.stat-icon{width:36px;height:36px;border-radius:11px;display:grid;place-items:center;background:#1d334b}
+.two-col{grid-template-columns:minmax(0,1.4fr) minmax(280px,.9fr)}
+.section-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:15px}.section-head h2{font-size:15px;margin:0}
+.list{display:grid;gap:10px}.list-row{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px;border:1px solid #26374c;border-radius:12px;background:#142136}
+.person{display:flex;align-items:center;gap:11px;min-width:0}.avatar{width:38px;height:38px;border-radius:12px;background:#25415b;color:#c7efff;display:grid;place-items:center;font-weight:800;flex:none}
+.person strong{font-size:12px;display:block}.person span{font-size:11px;color:var(--muted);display:block;margin-top:4px}
+.badge{font-size:10px;font-weight:800;padding:5px 8px;border-radius:30px;white-space:nowrap}
+.badge-red{background:rgba(239,68,68,.14);color:#fca5a5}.badge-amber{background:rgba(245,158,11,.14);color:#fcd38a}.badge-green{background:rgba(16,185,129,.14);color:#6ee7b7}.badge-blue{background:rgba(56,189,248,.14);color:#7dd3fc}
+.table-wrap{overflow:auto;border:1px solid var(--line);border-radius:12px}
+table{width:100%;border-collapse:collapse;min-width:620px}th,td{text-align:left;padding:13px 14px;border-bottom:1px solid var(--line);font-size:12px}th{color:#8fa3ba;font-size:10px;letter-spacing:1px;text-transform:uppercase;background:#101b2b}td{color:#dce7f3}tr:last-child td{border-bottom:0}
+.search{max-width:280px;background:#0c1727;border:1px solid var(--line);border-radius:10px;padding:10px 12px;color:var(--text)}
+.empty{padding:28px;text-align:center;color:var(--muted);font-size:12px;border:1px dashed #34465c;border-radius:12px}
+.messages{display:flex;flex-direction:column;gap:10px;padding:12px 0;overflow:auto}
+.message{max-width:82%;padding:10px 12px;border-radius:12px;background:#1b2b40;font-size:12px;line-height:1.5;overflow-wrap:anywhere}
+.message.mine{align-self:flex-end;background:#075b86}
+.message small{display:block;color:#c1d1df;margin-top:5px;font-size:9px}
+.chat-compose{display:flex;gap:8px;border-top:1px solid var(--line);padding-top:12px}
+.chat-compose input{flex:1;min-width:0}
+.callout{border:1px solid rgba(56,189,248,.25);background:rgba(56,189,248,.07);padding:14px;border-radius:12px;font-size:12px;color:#c5eaff;line-height:1.6}
+.kv{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}.kv div{padding:13px;background:#142136;border:1px solid var(--line);border-radius:11px}.kv span{display:block;color:var(--muted);font-size:10px}.kv strong{display:block;margin-top:7px;font-size:13px}
+#toast{position:fixed;right:22px;bottom:22px;background:#17314a;border:1px solid #31506c;color:#e7f7ff;padding:12px 16px;border-radius:11px;font-size:12px;z-index:20;box-shadow:var(--shadow)}
+.footer-note{font-size:10px;color:#73869d;margin-top:18px;line-height:1.6}
+@media(max-width:1000px){.stats{grid-template-columns:repeat(2,1fr)}.two-col{grid-template-columns:1fr}}
+@media(max-width:720px){.topbar{padding:0 14px}.topbrand span:last-child{font-size:12px}.connection{display:none}.layout{grid-template-columns:1fr}.sidebar{display:flex;overflow:auto;padding:9px;border-right:0;border-bottom:1px solid var(--line);gap:4px}.side-label,.sidebar-bottom{display:none}.nav-btn{width:auto;white-space:nowrap;padding:10px}.main{padding:19px 14px}.stats{gap:10px}.card{padding:14px}.page-head{display:block}.page-head .btn{margin-top:14px}.kv{grid-template-columns:1fr}}
+@media(max-width:390px){.stats{grid-template-columns:1fr 1fr}.stat-value{font-size:24px}}
 </style>
 </head>
-
 <body>
-
-<!-- LOGIN SCREEN -->
-
 <section id="loginScreen">
-
   <div class="login-card">
-
     <div class="brand-mark">✚</div>
-
     <div class="eyebrow">AstroCare · Clinical Network</div>
-
     <h1>Medical Centre</h1>
-
-    <p class="muted small">
-      Secure access for authorised mission medical personnel.
-    </p>
-
+    <p class="muted small">Secure access for authorised mission medical personnel.</p>
     <form id="loginForm">
-
-      <div class="field">
-        <label for="email">DOCTOR EMAIL</label>
-        <input
-          id="email"
-          type="email"
-          autocomplete="username"
-          placeholder="doctor@organisation.org"
-          required
-        >
-      </div>
-
-      <div class="field">
-        <label for="password">PASSWORD</label>
-        <input
-          id="password"
-          type="password"
-          autocomplete="current-password"
-          placeholder="Enter your password"
-          required
-        >
-      </div>
-
-      <button
-        class="btn btn-primary btn-block"
-        id="loginBtn"
-        type="submit"
-      >
-        Sign in securely
-      </button>
-
+      <div class="field"><label for="email">DOCTOR USERNAME OR EMAIL</label><input id="email" type="text" autocomplete="username" placeholder="admin" required></div>
+      <div class="field"><label for="password">PASSWORD</label><input id="password" type="password" autocomplete="current-password" placeholder="Supabase account password" required></div>
+      <button class="btn btn-primary btn-block" id="loginBtn" type="submit">Sign in securely</button>
       <div id="loginError" class="error"></div>
-
     </form>
-
-    <div class="notice">
-      <strong>Authorised accounts only.</strong>
-      Doctor accounts must be created and assigned the doctor role
-      by a trusted administrator. Public doctor registration is disabled.
-    </div>
-
-    <p class="footer-note">
-      Prototype interface. Do not enter real patient information until
-      database permissions, clinical workflows and privacy controls
-      have been reviewed.
-    </p>
-
+    <div class="notice"><strong>Authorised accounts only.</strong> Doctor accounts must be created in Supabase Auth and assigned the doctor role by a trusted administrator. The username “admin” maps to admin@astrocare360.app. The password is verified by Supabase Auth, not stored in this browser. Public doctor registration is disabled.</div>
+    <p class="footer-note">Prototype interface. Do not enter real patient information until database permissions, clinical workflows and privacy controls have been reviewed.</p>
   </div>
-
 </section>
 
-
-<!-- DOCTOR APPLICATION -->
-
 <div id="app" class="hidden">
-
   <header class="topbar">
-
-    <div class="topbrand">
-      <div class="mini-mark">✚</div>
-      <span>ASTROCARE</span>
-      <span class="muted">MEDICAL CENTRE</span>
-    </div>
-
-    <div class="top-actions">
-
-      <span class="connection" id="connectionText">
-        Secure session
-      </span>
-
-      <span id="doctorLabel" class="small muted">
-        Doctor
-      </span>
-
-      <button class="btn btn-quiet" id="logoutBtn">
-        Sign out
-      </button>
-
-    </div>
-
+    <div class="topbrand"><div class="mini-mark">✚</div><span>ASTROCARE</span><span class="muted">MEDICAL CENTRE</span></div>
+    <div class="top-actions"><span class="connection"><i class="dot"></i><span id="connectionText">Secure session</span></span><span id="doctorLabel" class="small muted">Doctor</span><button class="btn btn-quiet" id="logoutBtn">Sign out</button></div>
   </header>
-
-
   <div class="layout">
-
-    <!-- SIDEBAR -->
-
     <aside class="sidebar">
-
       <div class="side-label">WORKSPACE</div>
-
-      <button class="nav-btn active" data-page="dashboard">
-        <span class="nav-icon">▦</span>
-        Overview
-      </button>
-
-      <button class="nav-btn" data-page="astronauts">
-        <span class="nav-icon">♙</span>
-        Astronaut directory
-      </button>
-
-      <button class="nav-btn" data-page="requests">
-        <span class="nav-icon">✚</span>
-        Medical requests
-      </button>
-
-      <button class="nav-btn" data-page="communications">
-        <span class="nav-icon">▤</span>
-        Communications
-      </button>
-
-      <button class="nav-btn" data-page="monitoring">
-        <span class="nav-icon">⌁</span>
-        Health monitoring
-      </button>
-
-      <button class="nav-btn" data-page="records">
-        <span class="nav-icon">▣</span>
-        Medical records
-      </button>
-
-      <button class="nav-btn" data-page="reports">
-        <span class="nav-icon">▥</span>
-        Mission reports
-      </button>
-
+      <button class="nav-btn active" data-page="dashboard"><span class="nav-icon">▦</span>Overview</button>
+      <button class="nav-btn" data-page="astronauts"><span class="nav-icon">♙</span>Astronaut directory</button>
+      <button class="nav-btn" data-page="requests"><span class="nav-icon">✚</span>Medical requests</button>
+      <button class="nav-btn" data-page="communications"><span class="nav-icon">▤</span>Communications</button>
+      <button class="nav-btn" data-page="monitoring"><span class="nav-icon">⌁</span>Health monitoring</button>
+      <button class="nav-btn" data-page="records"><span class="nav-icon">▣</span>Medical records</button>
+      <button class="nav-btn" data-page="reports"><span class="nav-icon">▥</span>Mission reports</button>
+      <div class="sidebar-bottom"><div class="eyebrow">MISSION HEALTH</div><p class="small muted" style="margin:8px 0 0">Review incoming requests and shared health information. Urgent cases should also follow the mission's established emergency protocol.</p></div>
     </aside>
-
-
-    <!-- MAIN CONTENT -->
-
     <main class="main">
-
-      <!-- DASHBOARD -->
-
       <section id="page-dashboard" class="page">
-
-        <div class="page-head">
-
-          <div>
-            <div class="eyebrow">CLINICAL WORKSPACE</div>
-            <h1>Doctor overview</h1>
-            <p>
-              Mission health activity and items requiring clinical review.
-            </p>
-          </div>
-
-          <button
-            class="btn btn-quiet"
-            onclick="toast('Database modules are awaiting connection.')"
-          >
-            ↻ Refresh overview
-          </button>
-
-        </div>
-
-
+        <div class="page-head"><div><div class="eyebrow">CLINICAL WORKSPACE</div><h1>Doctor overview</h1><p>Mission health activity and items requiring clinical review.</p></div><button class="btn btn-quiet" onclick="toast('Overview refresh is not available until the dashboard data queries are connected.')">↻ Refresh overview</button></div>
         <div class="grid stats">
-
-          <div class="card">
-            <div class="stat-top">
-              Assigned astronauts
-              <span class="stat-icon">♙</span>
-            </div>
-            <div class="stat-value">—</div>
-            <div class="stat-note">
-              Awaiting authorised directory data
-            </div>
-          </div>
-
-          <div class="card">
-            <div class="stat-top">
-              Pending requests
-              <span class="stat-icon">✚</span>
-            </div>
-            <div class="stat-value">—</div>
-            <div class="stat-note">
-              Awaiting request-table connection
-            </div>
-          </div>
-
-          <div class="card">
-            <div class="stat-top">
-              Unread messages
-              <span class="stat-icon">▤</span>
-            </div>
-            <div class="stat-value">—</div>
-            <div class="stat-note">
-              Awaiting communications connection
-            </div>
-          </div>
-
-          <div class="card">
-            <div class="stat-top">
-              Priority alerts
-              <span class="stat-icon">⚑</span>
-            </div>
-            <div class="stat-value">—</div>
-            <div class="stat-note">
-              Awaiting verified alert data
-            </div>
-          </div>
-
+          <div class="card"><div class="stat-top">Assigned astronauts <span class="stat-icon">♙</span></div><div class="stat-value">—</div><div class="stat-note">Awaiting authorised directory data</div></div>
+          <div class="card"><div class="stat-top">Pending requests <span class="stat-icon">✚</span></div><div class="stat-value">—</div><div class="stat-note">Awaiting request-table connection</div></div>
+          <div class="card"><div class="stat-top">Unread messages <span class="stat-icon">▤</span></div><div class="stat-value">—</div><div class="stat-note">Awaiting communications connection</div></div>
+          <div class="card"><div class="stat-top">Priority alerts <span class="stat-icon">⚑</span></div><div class="stat-value">—</div><div class="stat-note">Awaiting verified alert data</div></div>
         </div>
-
-
         <div class="grid two-col">
-
-          <div class="card">
-
-            <div class="section-head">
-              <h2>Incoming medical requests</h2>
-
-              <button
-                class="btn btn-quiet"
-                data-goto="requests"
-              >
-                View all
-              </button>
-            </div>
-
-            <div class="empty">
-              No live requests are loaded yet.
-              Connect the verified Supabase schema to display
-              astronaut submissions here.
-            </div>
-
-          </div>
-
-
-          <div class="card">
-
-            <div class="section-head">
-              <h2>Clinical notices</h2>
-              <span class="badge badge-blue">System</span>
-            </div>
-
-            <div class="list">
-
-              <div class="list-row">
-                <div class="avatar">i</div>
-                <div class="person">
-                  <strong>Secure access enabled</strong>
-                  <span>Doctor role is checked after sign-in.</span>
-                </div>
-              </div>
-
-              <div class="list-row">
-                <div class="avatar">↗</div>
-                <div class="person">
-                  <strong>Communication limitations</strong>
-                  <span>Deep-space messages may be delayed.</span>
-                </div>
-              </div>
-
-              <div class="list-row">
-                <div class="avatar">✓</div>
-                <div class="person">
-                  <strong>Prototype data policy</strong>
-                  <span>No fabricated patient readings are displayed as real.</span>
-                </div>
-              </div>
-
-            </div>
-
-          </div>
-
+          <div class="card"><div class="section-head"><h2>Incoming medical requests</h2><button class="btn btn-quiet" data-goto="requests">View all</button></div><div class="empty">No live requests are loaded yet. Connect the verified Supabase schema to display astronaut submissions here.</div></div>
+          <div class="card"><div class="section-head"><h2>Clinical notices</h2><span class="badge badge-blue">System</span></div><div class="list"><div class="list-row"><div class="person"><div class="avatar">i</div><div><strong>Secure access enabled</strong><span>Doctor role is checked after sign-in.</span></div></div></div><div class="list-row"><div class="person"><div class="avatar">↗</div><div><strong>Communication limitations</strong><span>Deep-space messages may be delayed.</span></div></div></div><div class="list-row"><div class="person"><div class="avatar">✓</div><div><strong>Prototype data policy</strong><span>No fabricated patient readings are displayed as real.</span></div></div></div></div></div>
         </div>
-
-        <p class="footer-note">
-          This portal is a prototype decision-support interface,
-          not a diagnostic device or substitute for professional
-          clinical judgement.
-        </p>
-
+        <p class="footer-note">This portal is a prototype decision-support interface, not a diagnostic device or substitute for professional clinical judgement.</p>
       </section>
-
-
-      <!-- ASTRONAUT DIRECTORY -->
 
       <section id="page-astronauts" class="page hidden">
-
-        <div class="page-head">
-          <div>
-            <div class="eyebrow">PATIENT ACCESS</div>
-            <h1>Astronaut directory</h1>
-            <p>
-              Only astronauts whose records you are authorised to access
-              should appear here.
-            </p>
-          </div>
-        </div>
-
-        <div class="card">
-          <div class="empty">
-            The directory will populate when profiles and doctor-access
-            relationships are connected and verified.
-          </div>
-        </div>
-
+        <div class="page-head"><div><div class="eyebrow">PATIENT ACCESS</div><h1>Astronaut directory</h1><p>Only astronauts whose records you are authorised to access should appear here.</p></div><input class="search" id="astronautSearch" placeholder="Search astronaut directory…" disabled></div>
+        <div class="card"><div class="empty">The directory will populate when the profiles and doctor-access relationships are connected and verified. No astronaut records are being invented for this prototype.</div></div>
       </section>
-
-
-      <!-- MEDICAL REQUESTS -->
 
       <section id="page-requests" class="page hidden">
-
-        <div class="page-head">
-          <div>
-            <div class="eyebrow">TRIAGE WORKSPACE</div>
-            <h1>Medical requests</h1>
-            <p>
-              Review astronaut-submitted requests and their priority
-              once the backend is connected.
-            </p>
-          </div>
-
-          <span class="badge badge-amber">
-            Connection pending
-          </span>
-        </div>
-
-        <div class="card">
-          <div class="empty">
-            No live request data is loaded.
-            The triage_requests table and its RLS policies must be
-            checked before requests can be shown or updated.
-          </div>
-        </div>
-
+        <div class="page-head"><div><div class="eyebrow">TRIAGE WORKSPACE</div><h1>Medical requests</h1><p>Review astronaut-submitted requests and their priority once the backend is connected.</p></div><span class="badge badge-amber">Connection pending</span></div>
+        <div class="card"><div class="empty">No live request data is loaded. The triage_requests table and its RLS policies must be checked before requests can be shown or updated.</div></div>
       </section>
-
-
-      <!-- COMMUNICATIONS -->
 
       <section id="page-communications" class="page hidden">
-
-        <div class="page-head">
-          <div>
-            <div class="eyebrow">SECURE MESSAGING</div>
-            <h1>Communications</h1>
-            <p>
-              Doctor–astronaut conversations, delivery states
-              and message history.
-            </p>
-          </div>
+        <div class="page-head"><div><div class="eyebrow">SECURE MESSAGING</div><h1>Communications</h1><p>Doctor–astronaut conversations, delivery states and message history.</p></div></div>
+        <div class="grid two-col">
+          <div class="card"><div class="section-head"><h2>Patient conversations</h2><button class="btn btn-quiet" id="refreshDoctorChats">Refresh</button></div><div id="doctorConversationList" class="list"><div class="empty">Loading authorised conversations…</div></div><p id="doctorChatStatus" class="footer-note" role="status">Messages are visible only to conversation participants under RLS.</p></div>
+          <div class="card"><div class="section-head"><h2 id="doctorChatTitle">Conversation</h2><span class="badge badge-amber" id="doctorChatState">Not selected</span></div><div id="doctorMessages" class="messages" style="min-height:270px;max-height:420px;overflow:auto"><div class="empty">Select a patient conversation.</div></div><form id="doctorMessageForm" class="chat-compose"><input id="doctorMessageInput" maxlength="4000" placeholder="Write a secure message…" disabled><button class="btn btn-primary" id="doctorSendButton" disabled>Send</button></form></div>
         </div>
-
-        <div class="card">
-
-          <div class="callout">
-            Communication is not yet connected.
-            The final implementation will use authenticated participants,
-            conversation-level access controls and message delivery states.
-            It will not promise immediate delivery across deep-space links.
-          </div>
-
-          <div class="empty" style="margin-top:14px">
-            No conversations loaded.
-          </div>
-
-        </div>
-
       </section>
-
-
-      <!-- HEALTH MONITORING -->
 
       <section id="page-monitoring" class="page hidden">
-
-        <div class="page-head">
-          <div>
-            <div class="eyebrow">SHARED HEALTH DATA</div>
-            <h1>Health monitoring</h1>
-            <p>
-              Review authorised vital-sign observations and trends.
-            </p>
-          </div>
-        </div>
-
-        <div class="card">
-          <div class="empty">
-            No live health observations are loaded.
-            Only verified, timestamped data shared with your doctor
-            account will appear here.
-          </div>
-        </div>
-
+        <div class="page-head"><div><div class="eyebrow">SHARED HEALTH DATA</div><h1>Health monitoring</h1><p>Review authorised vital-sign observations and trends.</p></div></div>
+        <div class="card"><div class="empty">No live health observations are loaded. Only verified, timestamped data shared with your doctor account will appear here.</div></div>
       </section>
-
-
-      <!-- MEDICAL RECORDS -->
 
       <section id="page-records" class="page hidden">
-
-        <div class="page-head">
-          <div>
-            <div class="eyebrow">CLINICAL DOCUMENTATION</div>
-            <h1>Medical records</h1>
-            <p>
-              Access and document records according to patient permissions
-              and mission policy.
-            </p>
-          </div>
-        </div>
-
-        <div class="card">
-          <div class="empty">
-            Medical-record access is not connected yet.
-            Record creation and editing will be enabled only after
-            field-level permissions are implemented.
-          </div>
-        </div>
-
+        <div class="page-head"><div><div class="eyebrow">CLINICAL DOCUMENTATION</div><h1>Medical records</h1><p>Access and document records according to patient permissions and mission policy.</p></div></div>
+        <div class="card"><div class="empty">Medical-record access is not connected yet. Record creation and editing will be enabled only after field-level permissions are implemented.</div></div>
       </section>
-
-
-      <!-- MISSION REPORTS -->
 
       <section id="page-reports" class="page hidden">
-
-        <div class="page-head">
-          <div>
-            <div class="eyebrow">MISSION DOCUMENTATION</div>
-            <h1>Mission reports</h1>
-            <p>
-              Review authorised mission health summaries and clinical reports.
-            </p>
-          </div>
-        </div>
-
-        <div class="card">
-          <div class="empty">
-            No reports loaded.
-            Report generation will be connected after the data model
-            and access rules are verified.
-          </div>
-        </div>
-
+        <div class="page-head"><div><div class="eyebrow">MISSION DOCUMENTATION</div><h1>Mission reports</h1><p>Review authorised mission health summaries and clinical reports.</p></div></div>
+        <div class="card"><div class="empty">No reports loaded. Report generation will be connected after the data model and access rules are verified.</div></div>
       </section>
-
     </main>
-
   </div>
-
 </div>
-
-
-<div id="toast" class="hidden"></div>
-
+<div id="toast" class="hidden" role="status"></div>
 
 <script>
+/* Public Supabase project settings. The anon key is intended for browser use.
+   Never place a service_role key or database password in this file. */
+const SUPABASE_URL = "https://qpmwklyinjlfiubaabse.supabase.co";
+const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFwbXdrbHlpbmpsZml1YmFhYnNlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTQ2NTc3MjksImV4cCI6MjExMDIzMzcyOX0.H88XAMBPYAOSAYszwEqkiS8SViiDXUt8aegrKySbFaU";
 
-/* =========================================
-   SUPABASE CONFIGURATION
-========================================= */
+const supabaseReady = !!(window.supabase && SUPABASE_URL && SUPABASE_ANON_KEY);
+const db = supabaseReady ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+  auth:{ persistSession:true, autoRefreshToken:true, detectSessionInUrl:true }
+}) : null;
 
-const SUPABASE_URL =
-"https://qpmwklyinjlfiubaabse.supabase.co";
-
-const SUPABASE_ANON_KEY =
-"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFwbXdrbHlpbmpsZml1YmFhYnNlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTQ2NTc3MjksImV4cCI6MjExMDIzMzcyOX0.H88XAMBPYAOSAYszwEqkiS8SViiDXUt8aegrKySbFaU";
-
-
-const supabaseReady =
-  !!(window.supabase && SUPABASE_URL && SUPABASE_ANON_KEY);
-
-const db = supabaseReady
-  ? window.supabase.createClient(
-      SUPABASE_URL,
-      SUPABASE_ANON_KEY,
-      {
-        auth: {
-          persistSession:true,
-          autoRefreshToken:true,
-          detectSessionInUrl:true
-        }
-      }
-    )
-  : null;
-
-
-const $ = id => document.getElementById(id);
-
-
-/* =========================================
-   NOTIFICATION
-========================================= */
-
-function toast(message) {
-
-  const el = $("toast");
-
-  el.textContent = message;
-
-  el.classList.remove("hidden");
-
-  clearTimeout(window.toastTimer);
-
-  window.toastTimer = setTimeout(() => {
-    el.classList.add("hidden");
-  }, 3500);
-
+const $ = (id)=>document.getElementById(id);
+function toast(message){
+  const el=$("toast"); el.textContent=message; el.classList.remove("hidden");
+  clearTimeout(window.toastTimer); window.toastTimer=setTimeout(()=>el.classList.add("hidden"),3500);
 }
-
-
-/* =========================================
-   LOGIN SCREEN
-========================================= */
-
-function showLogin(error = "") {
-
-  $("app").classList.add("hidden");
-
-  $("loginScreen").classList.remove("hidden");
-
-  $("loginError").textContent = error;
-
+function showLogin(error=""){
+  $("app").classList.add("hidden"); $("loginScreen").classList.remove("hidden");
+  $("loginError").textContent=error;
 }
-
-
-/* =========================================
-   SHOW DOCTOR DASHBOARD
-========================================= */
-
-function showApp(profile) {
-
-  $("loginScreen").classList.add("hidden");
-
-  $("app").classList.remove("hidden");
-
-  $("doctorLabel").textContent = "Authorised doctor";
-
-  $("connectionText").textContent = "Authenticated session";
-
+function showApp(profile){
+  $("loginScreen").classList.add("hidden"); $("app").classList.remove("hidden");
+  $("doctorLabel").textContent=profile?.display_name || "Authorised doctor";
+  $("connectionText").textContent="Authenticated session";
 }
-
-
-/* =========================================
-   VERIFY DOCTOR ROLE
-========================================= */
-
-async function verifyDoctor(user) {
-
-  /*
-    IMPORTANT:
-
-    The profiles query intentionally requests only:
-    id and role.
-
-    This avoids the earlier full_name column error.
-
-    The doctor role must be assigned by a trusted
-    administrator, never by the frontend.
-  */
-
-  const { data, error } = await db
-    .from("profiles")
-    .select("id, role")
-    .eq("id", user.id)
-    .maybeSingle();
-
-
-  if (error) {
-
-    throw new Error(
-      "Could not verify your doctor profile. " +
-      "Check that public.profiles and its SELECT policy " +
-      "are configured. " +
-      error.message
-    );
-
-  }
-
-
-  if (
-    !data ||
-    !["doctor", "admin"].includes(
-      String(data.role).toLowerCase()
-    )
-  ) {
-
+async function verifyDoctor(user){
+  // The current project schema uses public.profiles with id, role and display_name.
+  // The role must be assigned by a trusted administrator, never by this page.
+  const {data,error}=await db.from("profiles").select("id, role, display_name").eq("id",user.id).maybeSingle();
+  if(error) throw new Error("Could not verify your doctor profile. Check that public.profiles and its SELECT policy are configured. "+error.message);
+  if(!data || !["doctor","admin"].includes(String(data.role).toLowerCase())){
     await db.auth.signOut();
-
-    throw new Error(
-      "This account is not authorised for the Doctor Portal. " +
-      "Ask the project administrator to assign the doctor role."
-    );
-
+    throw new Error("This account is not authorised for the Doctor Portal. Ask the project administrator to verify and assign your doctor role.");
   }
-
-
+  window.doctorUser=user;
   showApp(data);
-
+  await initDoctorMessaging();
 }
 
+// ---------------- SECURE DOCTOR–PATIENT MESSAGING ----------------
+let doctorActiveConversation=null,doctorChatChannel=null;
+function doctorChatStatus(message,isError=false){const el=$('doctorChatStatus');if(el){el.textContent=message;el.style.color=isError?'#fca5a5':'var(--muted)';}}
+async function initDoctorMessaging(){
+ if(!db||!window.doctorUser)return;
+ await loadDoctorConversations();
+ if(doctorChatChannel)await db.removeChannel(doctorChatChannel);
+ doctorChatChannel=db.channel('doctor-care-'+window.doctorUser.id)
+  .on('postgres_changes',{event:'*',schema:'public',table:'care_messages'},payload=>{
+    if(doctorActiveConversation&&payload.new?.conversation_id===doctorActiveConversation.id)loadDoctorMessages(doctorActiveConversation.id);
+    loadDoctorConversations();
+  }).subscribe();
+ doctorChatStatus('Secure messaging connected.');
+}
+async function loadDoctorConversations(){
+ if(!db||!window.doctorUser)return;
+ const box=$('doctorConversationList');const {data,error}=await db.from('care_conversations').select('id,patient_id,status,updated_at').eq('doctor_id',window.doctorUser.id).order('updated_at',{ascending:false});
+ if(error){box.innerHTML='<div class="empty">Conversations could not be loaded.</div>';doctorChatStatus(error.message,true);return;}
+ if(!data?.length){box.innerHTML='<div class="empty">No patient conversations have been started.</div>';return;}
+ box.innerHTML=data.map(c=>`<button class="btn-quiet" style="text-align:left;padding:12px;border-radius:10px" onclick="openDoctorConversation('${c.id}','${c.patient_id}')"><strong>Patient conversation</strong><br><span class="small muted">${c.patient_id.slice(0,8)}… · ${new Date(c.updated_at).toLocaleString()}</span></button>`).join('');
+}
+async function openDoctorConversation(id,patientId){doctorActiveConversation={id};$('doctorChatTitle').textContent='Patient '+patientId.slice(0,8)+'…';$('doctorChatState').textContent='Open';$('doctorMessageInput').disabled=false;$('doctorSendButton').disabled=false;await loadDoctorMessages(id);}
+async function loadDoctorMessages(id){
+ const box=$('doctorMessages');const {data,error}=await db.from('care_messages').select('id,sender_id,body,created_at,read_at').eq('conversation_id',id).order('created_at',{ascending:true});
+ if(error){box.innerHTML='<div class="empty">Messages could not be loaded.</div>';doctorChatStatus(error.message,true);return;}
+ box.innerHTML=data?.length?data.map(m=>`<div class="message ${m.sender_id===window.doctorUser.id?'mine':''}">${String(m.body).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}<small>${m.sender_id===window.doctorUser.id?'You':'Patient'} · ${new Date(m.created_at).toLocaleString()}</small></div>`).join(''):'<div class="empty">No messages yet.</div>';
+ box.scrollTop=box.scrollHeight;await db.rpc('astrocare_mark_messages_read',{p_conversation_id:id});
+}
+$('doctorMessageForm').addEventListener('submit',async e=>{
+ e.preventDefault();if(!doctorActiveConversation)return;const input=$('doctorMessageInput'),body=input.value.trim();if(!body)return;const btn=$('doctorSendButton');btn.disabled=true;
+ try{const {error}=await db.from('care_messages').insert({conversation_id:doctorActiveConversation.id,sender_id:window.doctorUser.id,body});if(error)throw error;input.value='';await loadDoctorMessages(doctorActiveConversation.id);await loadDoctorConversations();}
+ catch(err){doctorChatStatus('Message not sent: '+err.message,true);}finally{btn.disabled=false;}
+});
+$('refreshDoctorChats').addEventListener('click',loadDoctorConversations);
 
-/* =========================================
-   INITIALISE APPLICATION
-========================================= */
-
-async function initialise() {
-
-  if (!supabaseReady) {
-
-    showLogin(
-      "Supabase client could not load. Check your internet connection."
-    );
-
-    return;
-
-  }
-
-
-  const {
-    data: { session },
-    error
-  } = await db.auth.getSession();
-
-
-  if (error) {
-
-    showLogin(error.message);
-
-    return;
-
-  }
-
-
-  if (session?.user) {
-
-    try {
-
-      await verifyDoctor(session.user);
-
-    } catch (e) {
-
-      showLogin(e.message);
-
+async function initialise(){
+  if(!supabaseReady){showLogin("Supabase client could not load. Check your internet connection and reload.");return;}
+  const {data:{session},error}=await db.auth.getSession();
+  if(error){showLogin(error.message);return;}
+  if(session?.user){
+    try{await verifyDoctor(session.user)}catch(e){showLogin(e.message)}
+  }else showLogin();
+  db.auth.onAuthStateChange(async(event,sessionNow)=>{
+    if(event==="SIGNED_OUT"){showLogin();return;}
+    if(sessionNow?.user && event==="SIGNED_IN"){
+      try{await verifyDoctor(sessionNow.user)}catch(e){showLogin(e.message)}
     }
-
-  } else {
-
-    showLogin();
-
-  }
-
-
-  db.auth.onAuthStateChange(async (event, sessionNow) => {
-
-    if (event === "SIGNED_OUT") {
-
-      showLogin();
-
-      return;
-
-    }
-
-
-    if (sessionNow?.user && event === "SIGNED_IN") {
-
-      try {
-
-        await verifyDoctor(sessionNow.user);
-
-      } catch (e) {
-
-        showLogin(e.message);
-
-      }
-
-    }
-
   });
-
 }
-
-
-/* =========================================
-   LOGIN FORM
-========================================= */
-
-$("loginForm").addEventListener("submit", async (e) => {
-
-  e.preventDefault();
-
-  $("loginBtn").disabled = true;
-
-  $("loginBtn").textContent = "Verifying…";
-
-  $("loginError").textContent = "";
-
-
-  try {
-
-    if (!db) {
-
-      throw new Error(
-        "Supabase is unavailable. Check your connection."
-      );
-
-    }
-
-
-    const email = $("email").value.trim();
-
-    const password = $("password").value;
-
-
-    const { data, error } = await db.auth.signInWithPassword({
-
-      email,
-
-      password
-
-    });
-
-
-    if (error) {
-
-      throw error;
-
-    }
-
-
+$("loginForm").addEventListener("submit",async(e)=>{
+  e.preventDefault(); $("loginBtn").disabled=true; $("loginBtn").textContent="Verifying…"; $("loginError").textContent="";
+  try{
+    if(!db) throw new Error("Supabase is unavailable. Check your connection.");
+    const entered=$("email").value.trim(),password=$("password").value;
+    const email=entered.toLowerCase()==="admin" ? "admin@astrocare360.app" : entered;
+    localStorage.setItem('astrocare_doctor_username',entered);
+    if(!email.includes("@")) throw new Error("Enter the admin username or your registered doctor email.");
+    const {data,error}=await db.auth.signInWithPassword({email,password});
+    if(error) throw error;
     await verifyDoctor(data.user);
-
-
-  } catch (err) {
-
-    $("loginError").textContent =
-      err.message || "Sign-in failed.";
-
-  } finally {
-
-    $("loginBtn").disabled = false;
-
-    $("loginBtn").textContent = "Sign in securely";
-
-  }
-
+  }catch(err){$("loginError").textContent=err.message || "Sign-in failed."}
+  finally{$("loginBtn").disabled=false;$("loginBtn").textContent="Sign in securely"}
 });
-
-
-/* =========================================
-   LOGOUT
-========================================= */
-
-$("logoutBtn").addEventListener("click", async () => {
-
-  if (db) {
-
-    await db.auth.signOut();
-
-  }
-
+$("logoutBtn").addEventListener("click",async()=>{
+  if(db) await db.auth.signOut();
   showLogin();
-
 });
-
-
-/* =========================================
-   SIDEBAR NAVIGATION
-========================================= */
-
-document.querySelectorAll(".nav-btn").forEach(btn => {
-
-  btn.addEventListener("click", () => {
-
-    navigate(btn.dataset.page);
-
-  });
-
-});
-
-
-document.querySelectorAll("[data-goto]").forEach(btn => {
-
-  btn.addEventListener("click", () => {
-
-    navigate(btn.dataset.goto);
-
-  });
-
-});
-
-
-function navigate(page) {
-
-  document.querySelectorAll(".page").forEach(p => {
-
-    p.classList.add("hidden");
-
-  });
-
-
-  const selectedPage = $("page-" + page);
-
-  if (selectedPage) {
-
-    selectedPage.classList.remove("hidden");
-
-  }
-
-
-  document.querySelectorAll(".nav-btn").forEach(btn => {
-
-    btn.classList.toggle(
-      "active",
-      btn.dataset.page === page
-    );
-
-  });
-
-
-  window.scrollTo({
-    top:0,
-    behavior:"smooth"
-  });
-
+document.querySelectorAll(".nav-btn").forEach(btn=>btn.addEventListener("click",()=>navigate(btn.dataset.page)));
+document.querySelectorAll("[data-goto]").forEach(btn=>btn.addEventListener("click",()=>navigate(btn.dataset.goto)));
+function navigate(page){
+  document.querySelectorAll(".page").forEach(p=>p.classList.add("hidden"));
+  $("page-"+page)?.classList.remove("hidden");
+  document.querySelectorAll(".nav-btn").forEach(b=>b.classList.toggle("active",b.dataset.page===page));
+  window.scrollTo(0,0);
 }
-
-
-/* START */
-
+const rememberedDoctorName=localStorage.getItem('astrocare_doctor_username');if(rememberedDoctorName)$('email').value=rememberedDoctorName;
 initialise();
-
 </script>
-
 </body>
 </html>
