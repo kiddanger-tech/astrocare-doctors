@@ -16,8 +16,6 @@
 *{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font-family:Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif}
 button,input,textarea,select{font:inherit}button{cursor:pointer}
 .hidden{display:none!important}
-#loginScreen{min-height:100vh;display:grid;place-items:center;padding:24px;background:radial-gradient(circle at 80% 10%,rgba(6,182,212,.12),transparent 30%),radial-gradient(circle at 10% 90%,rgba(56,189,248,.1),transparent 30%),var(--bg)}
-.login-card{width:min(440px,100%);background:rgba(18,29,45,.96);border:1px solid var(--line);border-radius:22px;padding:32px;box-shadow:var(--shadow)}
 .brand-mark{width:48px;height:48px;border-radius:14px;background:linear-gradient(135deg,#0ea5e9,#06b6d4);display:grid;place-items:center;font-size:23px;margin-bottom:20px}
 .eyebrow{color:var(--cyan);font-size:11px;font-weight:800;letter-spacing:1.7px;text-transform:uppercase}
 h1,h2,h3,p{margin-top:0}h1{font-size:25px;margin-bottom:8px}h2{font-size:21px}h3{font-size:15px}
@@ -71,33 +69,17 @@ table{width:100%;border-collapse:collapse;min-width:620px}th,td{text-align:left;
 .kv{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}.kv div{padding:13px;background:#142136;border:1px solid var(--line);border-radius:11px}.kv span{display:block;color:var(--muted);font-size:10px}.kv strong{display:block;margin-top:7px;font-size:13px}
 #toast{position:fixed;right:22px;bottom:22px;background:#17314a;border:1px solid #31506c;color:#e7f7ff;padding:12px 16px;border-radius:11px;font-size:12px;z-index:20;box-shadow:var(--shadow)}
 .footer-note{font-size:10px;color:#73869d;margin-top:18px;line-height:1.6}
-@media(max-width:1000px){.stats{grid-template-columns:repeat(2,1fr)}.two-col{grid-template-columns:1fr}}
-@media(max-width:720px){.topbar{padding:0 14px}.topbrand span:last-child{font-size:12px}.connection{display:none}.layout{grid-template-columns:1fr}.sidebar{display:flex;overflow:auto;padding:9px;border-right:0;border-bottom:1px solid var(--line);gap:4px}.side-label,.sidebar-bottom{display:none}.nav-btn{width:auto;white-space:nowrap;padding:10px}.main{padding:19px 14px}.stats{gap:10px}.card{padding:14px}.page-head{display:block}.page-head .btn{margin-top:14px}.kv{grid-template-columns:1fr}}
+@media(max-width:1000px){.stats{grid-template-columns:repeat(2,1fr)}.two-col{grid-template-columns:minmax(0,1fr)}}
+@media(max-width:720px){.topbar{padding:0 14px}.topbrand span:last-child{font-size:12px}.connection{display:none}.layout{grid-template-columns:minmax(0,1fr)}.sidebar{display:flex;overflow:auto;padding:9px;border-right:0;border-bottom:1px solid var(--line);gap:4px}.side-label,.sidebar-bottom{display:none}.nav-btn{width:auto;white-space:nowrap;padding:10px}.main{padding:19px 14px}.stats{gap:10px}.card{padding:14px}.page-head{display:block}.page-head .btn{margin-top:14px}.kv{grid-template-columns:1fr}}
 @media(max-width:390px){.stats{grid-template-columns:1fr 1fr}.stat-value{font-size:24px}}
 </style>
 </head>
 <body>
-<section id="loginScreen">
-  <div class="login-card">
-    <div class="brand-mark">✚</div>
-    <div class="eyebrow">AstroCare · Clinical Network</div>
-    <h1>Medical Centre</h1>
-    <p class="muted small">Secure access for authorised mission medical personnel.</p>
-    <form id="loginForm">
-      <div class="field"><label for="email">DOCTOR USERNAME OR EMAIL</label><input id="email" type="text" autocomplete="username" placeholder="admin" required></div>
-      <div class="field"><label for="password">PASSWORD</label><input id="password" type="password" autocomplete="current-password" placeholder="Supabase account password" required></div>
-      <button class="btn btn-primary btn-block" id="loginBtn" type="submit">Sign in securely</button>
-      <div id="loginError" class="error"></div>
-    </form>
-    <div class="notice"><strong>Authorised accounts only.</strong> Doctor accounts must be created in Supabase Auth and assigned the doctor role by a trusted administrator. The username “admin” maps to admin@astrocare360.app. The password is verified by Supabase Auth, not stored in this browser. Public doctor registration is disabled.</div>
-    <p class="footer-note">Prototype interface. Do not enter real patient information until database permissions, clinical workflows and privacy controls have been reviewed.</p>
-  </div>
-</section>
 
-<div id="app" class="hidden">
+<div id="app">
   <header class="topbar">
     <div class="topbrand"><div class="mini-mark">✚</div><span>ASTROCARE</span><span class="muted">MEDICAL CENTRE</span></div>
-    <div class="top-actions"><span class="connection"><i class="dot"></i><span id="connectionText">Secure session</span></span><span id="doctorLabel" class="small muted">Doctor</span><button class="btn btn-quiet" id="logoutBtn">Sign out</button></div>
+    <div class="top-actions"><span class="connection"><i class="dot"></i><span id="connectionText">Clinic workspace</span></span><span id="doctorLabel" class="small muted">Admin clinic</span></div>
   </header>
   <div class="layout">
     <aside class="sidebar">
@@ -122,14 +104,14 @@ table{width:100%;border-collapse:collapse;min-width:620px}th,td{text-align:left;
         </div>
         <div class="grid two-col">
           <div class="card"><div class="section-head"><h2>Incoming medical requests</h2><button class="btn btn-quiet" data-goto="requests">View all</button></div><div class="empty">No live requests are loaded yet. Connect the verified Supabase schema to display astronaut submissions here.</div></div>
-          <div class="card"><div class="section-head"><h2>Clinical notices</h2><span class="badge badge-blue">System</span></div><div class="list"><div class="list-row"><div class="person"><div class="avatar">i</div><div><strong>Secure access enabled</strong><span>Doctor role is checked after sign-in.</span></div></div></div><div class="list-row"><div class="person"><div class="avatar">↗</div><div><strong>Communication limitations</strong><span>Deep-space messages may be delayed.</span></div></div></div><div class="list-row"><div class="person"><div class="avatar">✓</div><div><strong>Prototype data policy</strong><span>No fabricated patient readings are displayed as real.</span></div></div></div></div></div>
+          <div class="card"><div class="section-head"><h2>Clinical notices</h2><span class="badge badge-blue">System</span></div><div class="list"><div class="list-row"><div class="person"><div class="avatar">i</div><div><strong>Secure access enabled</strong><span>Doctor role is checked after sign-in.</span></div></div></div><div class="list-row"><div class="person"><div class="avatar">↗</div><div><strong>Communication limitations</strong><span>Deep-space messages may be delayed.</span></div></div></div><div class="list-row"><div class="person"><div class="avatar">✓</div><div><strong>Data policy</strong><span>No fabricated patient readings are displayed as real.</span></div></div></div></div></div>
         </div>
-        <p class="footer-note">This portal is a prototype decision-support interface, not a diagnostic device or substitute for professional clinical judgement.</p>
+        <p class="footer-note">This portal is a decision-support interface, not a diagnostic device or substitute for professional clinical judgement.</p>
       </section>
 
       <section id="page-astronauts" class="page hidden">
         <div class="page-head"><div><div class="eyebrow">PATIENT ACCESS</div><h1>Astronaut directory</h1><p>Only astronauts whose records you are authorised to access should appear here.</p></div><input class="search" id="astronautSearch" placeholder="Search astronaut directory…" disabled></div>
-        <div class="card"><div class="empty">The directory will populate when the profiles and doctor-access relationships are connected and verified. No astronaut records are being invented for this prototype.</div></div>
+        <div class="card"><div class="empty">The directory will populate when the profiles and doctor-access relationships are connected and verified. No astronaut records are being invented here.</div></div>
       </section>
 
       <section id="page-requests" class="page hidden">
@@ -180,31 +162,10 @@ function toast(message){
   const el=$("toast"); el.textContent=message; el.classList.remove("hidden");
   clearTimeout(window.toastTimer); window.toastTimer=setTimeout(()=>el.classList.add("hidden"),3500);
 }
-function showLogin(error=""){
-  $("app").classList.add("hidden"); $("loginScreen").classList.remove("hidden");
-  $("loginError").textContent=error;
-}
-function showApp(profile){
-  $("loginScreen").classList.add("hidden"); $("app").classList.remove("hidden");
-  $("doctorLabel").textContent=profile?.display_name || "Authorised doctor";
-  $("connectionText").textContent="Authenticated session";
-}
-async function verifyDoctor(user){
-  // The current project schema uses public.profiles with id, role and display_name.
-  // The role must be assigned by a trusted administrator, never by this page.
-  const {data,error}=await db.from("profiles").select("id, role, display_name").eq("id",user.id).maybeSingle();
-  if(error) throw new Error("Could not verify your doctor profile. Check that public.profiles and its SELECT policy are configured. "+error.message);
-  if(!data || !["doctor","admin"].includes(String(data.role).toLowerCase())){
-    await db.auth.signOut();
-    throw new Error("This account is not authorised for the Doctor Portal. Ask the project administrator to verify and assign your doctor role.");
-  }
-  window.doctorUser=user;
-  showApp(data);
-  await initDoctorMessaging();
-}
-
 // ---------------- SECURE DOCTOR–PATIENT MESSAGING ----------------
 let doctorActiveConversation=null,doctorChatChannel=null;
+const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+
 function doctorChatStatus(message,isError=false){const el=$('doctorChatStatus');if(el){el.textContent=message;el.style.color=isError?'#fca5a5':'var(--muted)';}}
 async function initDoctorMessaging(){
  if(!db||!window.doctorUser)return;
@@ -222,14 +183,15 @@ async function loadDoctorConversations(){
  const box=$('doctorConversationList');const {data,error}=await db.from('care_conversations').select('id,patient_id,status,updated_at').eq('doctor_id',window.doctorUser.id).order('updated_at',{ascending:false});
  if(error){box.innerHTML='<div class="empty">Conversations could not be loaded.</div>';doctorChatStatus(error.message,true);return;}
  if(!data?.length){box.innerHTML='<div class="empty">No patient conversations have been started.</div>';return;}
- box.innerHTML=data.map(c=>`<button class="btn-quiet" style="text-align:left;padding:12px;border-radius:10px" onclick="openDoctorConversation('${c.id}','${c.patient_id}')"><strong>Patient conversation</strong><br><span class="small muted">${c.patient_id.slice(0,8)}… · ${new Date(c.updated_at).toLocaleString()}</span></button>`).join('');
+ box.innerHTML=data.map(c=>`<button class="btn-quiet" style="text-align:left;padding:12px;border-radius:10px" data-cid="${esc(c.id)}" data-pid="${esc(c.patient_id)}"><strong>Patient conversation</strong><br><span class="small muted">${esc(String(c.patient_id).slice(0,8))}… · ${new Date(c.updated_at).toLocaleString()}</span></button>`).join('');
 }
 async function openDoctorConversation(id,patientId){doctorActiveConversation={id};$('doctorChatTitle').textContent='Patient '+patientId.slice(0,8)+'…';$('doctorChatState').textContent='Open';$('doctorMessageInput').disabled=false;$('doctorSendButton').disabled=false;await loadDoctorMessages(id);}
 async function loadDoctorMessages(id){
  const box=$('doctorMessages');const {data,error}=await db.from('care_messages').select('id,sender_id,body,created_at,read_at').eq('conversation_id',id).order('created_at',{ascending:true});
  if(error){box.innerHTML='<div class="empty">Messages could not be loaded.</div>';doctorChatStatus(error.message,true);return;}
  box.innerHTML=data?.length?data.map(m=>`<div class="message ${m.sender_id===window.doctorUser.id?'mine':''}">${String(m.body).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}<small>${m.sender_id===window.doctorUser.id?'You':'Patient'} · ${new Date(m.created_at).toLocaleString()}</small></div>`).join(''):'<div class="empty">No messages yet.</div>';
- box.scrollTop=box.scrollHeight;await db.rpc('astrocare_mark_messages_read',{p_conversation_id:id});
+ box.scrollTop=box.scrollHeight;
+ if(data?.some(m=>m.sender_id!==window.doctorUser.id&&!m.read_at))await db.rpc('astrocare_mark_messages_read',{p_conversation_id:id});
 }
 $('doctorMessageForm').addEventListener('submit',async e=>{
  e.preventDefault();if(!doctorActiveConversation)return;const input=$('doctorMessageInput'),body=input.value.trim();if(!body)return;const btn=$('doctorSendButton');btn.disabled=true;
@@ -237,39 +199,11 @@ $('doctorMessageForm').addEventListener('submit',async e=>{
  catch(err){doctorChatStatus('Message not sent: '+err.message,true);}finally{btn.disabled=false;}
 });
 $('refreshDoctorChats').addEventListener('click',loadDoctorConversations);
+$('doctorConversationList').addEventListener('click',e=>{const b=e.target.closest('[data-cid]');if(b)openDoctorConversation(b.dataset.cid,b.dataset.pid)});
 
-async function initialise(){
-  if(!supabaseReady){showLogin("Supabase client could not load. Check your internet connection and reload.");return;}
-  const {data:{session},error}=await db.auth.getSession();
-  if(error){showLogin(error.message);return;}
-  if(session?.user){
-    try{await verifyDoctor(session.user)}catch(e){showLogin(e.message)}
-  }else showLogin();
-  db.auth.onAuthStateChange(async(event,sessionNow)=>{
-    if(event==="SIGNED_OUT"){showLogin();return;}
-    if(sessionNow?.user && event==="SIGNED_IN"){
-      try{await verifyDoctor(sessionNow.user)}catch(e){showLogin(e.message)}
-    }
-  });
-}
-$("loginForm").addEventListener("submit",async(e)=>{
-  e.preventDefault(); $("loginBtn").disabled=true; $("loginBtn").textContent="Verifying…"; $("loginError").textContent="";
-  try{
-    if(!db) throw new Error("Supabase is unavailable. Check your connection.");
-    const entered=$("email").value.trim(),password=$("password").value;
-    const email=entered.toLowerCase()==="admin" ? "admin@astrocare360.app" : entered;
-    localStorage.setItem('astrocare_doctor_username',entered);
-    if(!email.includes("@")) throw new Error("Enter the admin username or your registered doctor email.");
-    const {data,error}=await db.auth.signInWithPassword({email,password});
-    if(error) throw error;
-    await verifyDoctor(data.user);
-  }catch(err){$("loginError").textContent=err.message || "Sign-in failed."}
-  finally{$("loginBtn").disabled=false;$("loginBtn").textContent="Sign in securely"}
-});
-$("logoutBtn").addEventListener("click",async()=>{
-  if(db) await db.auth.signOut();
-  showLogin();
-});
+// No sign-in: the portal opens directly. Patient messaging needs a signed-in account, so it stays unavailable.
+$("doctorConversationList").innerHTML='<div class="empty">Patient conversations are not available because no doctor account is connected.</div>';
+doctorChatStatus('Messaging is unavailable until a doctor account is connected.');
 document.querySelectorAll(".nav-btn").forEach(btn=>btn.addEventListener("click",()=>navigate(btn.dataset.page)));
 document.querySelectorAll("[data-goto]").forEach(btn=>btn.addEventListener("click",()=>navigate(btn.dataset.goto)));
 function navigate(page){
@@ -278,8 +212,6 @@ function navigate(page){
   document.querySelectorAll(".nav-btn").forEach(b=>b.classList.toggle("active",b.dataset.page===page));
   window.scrollTo(0,0);
 }
-const rememberedDoctorName=localStorage.getItem('astrocare_doctor_username');if(rememberedDoctorName)$('email').value=rememberedDoctorName;
-initialise();
 </script>
 </body>
 </html>
