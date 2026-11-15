@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="theme-color" content="#0b1220">
 <title>AstroCare Medical Centre | Doctor Portal</title>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.0"></script>
 <style>
 :root{
   --bg:#0b1220;--panel:#121d2d;--panel2:#172438;--line:#26364b;
@@ -79,7 +79,7 @@ table{width:100%;border-collapse:collapse;min-width:620px}th,td{text-align:left;
 <div id="app">
   <header class="topbar">
     <div class="topbrand"><div class="mini-mark">✚</div><span>ASTROCARE</span><span class="muted">MEDICAL CENTRE</span></div>
-    <div class="top-actions"><span class="connection"><i class="dot"></i><span id="connectionText">Clinic workspace</span></span><span id="doctorLabel" class="small muted">Admin clinic</span></div>
+    <div class="top-actions"><span class="connection"><i class="dot"></i><span id="connectionText">Connecting…</span></span><span id="doctorLabel" class="small muted">Admin clinic</span></div>
   </header>
   <div class="layout">
     <aside class="sidebar">
@@ -91,38 +91,38 @@ table{width:100%;border-collapse:collapse;min-width:620px}th,td{text-align:left;
       <button class="nav-btn" data-page="monitoring"><span class="nav-icon">⌁</span>Health monitoring</button>
       <button class="nav-btn" data-page="records"><span class="nav-icon">▣</span>Medical records</button>
       <button class="nav-btn" data-page="reports"><span class="nav-icon">▥</span>Mission reports</button>
-      <div class="sidebar-bottom"><div class="eyebrow">MISSION HEALTH</div><p class="small muted" style="margin:8px 0 0">Review incoming requests and shared health information. Urgent cases should also follow the mission's established emergency protocol.</p></div>
+      <div class="sidebar-bottom"><div class="eyebrow">MISSION HEALTH</div><p class="small muted" style="margin:8px 0 0">Review incoming requests and reply to astronauts live. Urgent cases should also follow the mission's established emergency protocol.</p></div>
     </aside>
     <main class="main">
       <section id="page-dashboard" class="page">
-        <div class="page-head"><div><div class="eyebrow">CLINICAL WORKSPACE</div><h1>Doctor overview</h1><p>Mission health activity and items requiring clinical review.</p></div><button class="btn btn-quiet" onclick="toast('Overview refresh is not available until the dashboard data queries are connected.')">↻ Refresh overview</button></div>
+        <div class="page-head"><div><div class="eyebrow">CLINICAL WORKSPACE</div><h1>Doctor overview</h1><p>Mission health activity and items requiring clinical review.</p></div><button class="btn btn-quiet" onclick="loadAll(true)">↻ Refresh overview</button></div>
         <div class="grid stats">
-          <div class="card"><div class="stat-top">Assigned astronauts <span class="stat-icon">♙</span></div><div class="stat-value">—</div><div class="stat-note">Awaiting authorised directory data</div></div>
-          <div class="card"><div class="stat-top">Pending requests <span class="stat-icon">✚</span></div><div class="stat-value">—</div><div class="stat-note">Awaiting request-table connection</div></div>
-          <div class="card"><div class="stat-top">Unread messages <span class="stat-icon">▤</span></div><div class="stat-value">—</div><div class="stat-note">Awaiting communications connection</div></div>
-          <div class="card"><div class="stat-top">Priority alerts <span class="stat-icon">⚑</span></div><div class="stat-value">—</div><div class="stat-note">Awaiting verified alert data</div></div>
+          <div class="card"><div class="stat-top">Astronauts <span class="stat-icon">♙</span></div><div class="stat-value" id="stAstro">—</div><div class="stat-note">Registered from the astronaut app</div></div>
+          <div class="card"><div class="stat-top">Pending requests <span class="stat-icon">✚</span></div><div class="stat-value" id="stPending">—</div><div class="stat-note">New or being reviewed</div></div>
+          <div class="card"><div class="stat-top">Unread messages <span class="stat-icon">▤</span></div><div class="stat-value" id="stUnread">—</div><div class="stat-note">From astronauts</div></div>
+          <div class="card"><div class="stat-top">Resolved requests <span class="stat-icon">✓</span></div><div class="stat-value" id="stResolved">—</div><div class="stat-note">Closed by the clinic</div></div>
         </div>
         <div class="grid two-col">
-          <div class="card"><div class="section-head"><h2>Incoming medical requests</h2><button class="btn btn-quiet" data-goto="requests">View all</button></div><div class="empty">No live requests are loaded yet. Connect the verified Supabase schema to display astronaut submissions here.</div></div>
-          <div class="card"><div class="section-head"><h2>Clinical notices</h2><span class="badge badge-blue">System</span></div><div class="list"><div class="list-row"><div class="person"><div class="avatar">i</div><div><strong>Secure access enabled</strong><span>Doctor role is checked after sign-in.</span></div></div></div><div class="list-row"><div class="person"><div class="avatar">↗</div><div><strong>Communication limitations</strong><span>Deep-space messages may be delayed.</span></div></div></div><div class="list-row"><div class="person"><div class="avatar">✓</div><div><strong>Data policy</strong><span>No fabricated patient readings are displayed as real.</span></div></div></div></div></div>
+          <div class="card"><div class="section-head"><h2>Incoming medical requests</h2><button class="btn btn-quiet" data-goto="requests">View all</button></div><div id="dashRequests" class="list"><div class="empty">Loading…</div></div></div>
+          <div class="card"><div class="section-head"><h2>Clinical notices</h2><span class="badge badge-blue">System</span></div><div class="list"><div class="list-row"><div class="person"><div class="avatar">●</div><div><strong id="noticeConn">Connecting…</strong><span>Messages and requests from astronauts arrive here live.</span></div></div></div><div class="list-row"><div class="person"><div class="avatar">↗</div><div><strong>Communication limitations</strong><span>Deep-space messages may be delayed.</span></div></div></div><div class="list-row"><div class="person"><div class="avatar">✓</div><div><strong>Data policy</strong><span>Only information sent by astronauts is shown. Nothing is made up.</span></div></div></div></div></div>
         </div>
         <p class="footer-note">This portal is a decision-support interface, not a diagnostic device or substitute for professional clinical judgement.</p>
       </section>
 
       <section id="page-astronauts" class="page hidden">
-        <div class="page-head"><div><div class="eyebrow">PATIENT ACCESS</div><h1>Astronaut directory</h1><p>Only astronauts whose records you are authorised to access should appear here.</p></div><input class="search" id="astronautSearch" placeholder="Search astronaut directory…" disabled></div>
-        <div class="card"><div class="empty">The directory will populate when the profiles and doctor-access relationships are connected and verified. No astronaut records are being invented here.</div></div>
+        <div class="page-head"><div><div class="eyebrow">PATIENT ACCESS</div><h1>Astronaut directory</h1><p>Astronauts appear here once they open the astronaut app.</p></div><input class="search" id="astronautSearch" placeholder="Search astronaut directory…"></div>
+        <div class="card"><div id="astroList" class="list"><div class="empty">Loading…</div></div></div>
       </section>
 
       <section id="page-requests" class="page hidden">
-        <div class="page-head"><div><div class="eyebrow">TRIAGE WORKSPACE</div><h1>Medical requests</h1><p>Review astronaut-submitted requests and their priority once the backend is connected.</p></div><span class="badge badge-amber">Connection pending</span></div>
-        <div class="card"><div class="empty">No live request data is loaded. The triage_requests table and its RLS policies must be checked before requests can be shown or updated.</div></div>
+        <div class="page-head"><div><div class="eyebrow">TRIAGE WORKSPACE</div><h1>Medical requests</h1><p>Requests sent by astronauts from the Medical Triage page.</p></div><span class="badge badge-amber" id="reqBadge">Connecting…</span></div>
+        <div class="card"><div id="reqList" class="list"><div class="empty">Loading…</div></div></div>
       </section>
 
       <section id="page-communications" class="page hidden">
         <div class="page-head"><div><div class="eyebrow">SECURE MESSAGING</div><h1>Communications</h1><p>Doctor–astronaut conversations, delivery states and message history.</p></div></div>
         <div class="grid two-col">
-          <div class="card"><div class="section-head"><h2>Patient conversations</h2><button class="btn btn-quiet" id="refreshDoctorChats">Refresh</button></div><div id="doctorConversationList" class="list"><div class="empty">Loading authorised conversations…</div></div><p id="doctorChatStatus" class="footer-note" role="status">Messages are visible only to conversation participants under RLS.</p></div>
+          <div class="card"><div class="section-head"><h2>Patient conversations</h2><button class="btn btn-quiet" id="refreshDoctorChats">Refresh</button></div><div id="doctorConversationList" class="list"><div class="empty">Loading conversations…</div></div><p id="doctorChatStatus" class="footer-note" role="status">Connecting…</p></div>
           <div class="card"><div class="section-head"><h2 id="doctorChatTitle">Conversation</h2><span class="badge badge-amber" id="doctorChatState">Not selected</span></div><div id="doctorMessages" class="messages" style="min-height:270px;max-height:420px;overflow:auto"><div class="empty">Select a patient conversation.</div></div><form id="doctorMessageForm" class="chat-compose"><input id="doctorMessageInput" maxlength="4000" placeholder="Write a secure message…" disabled><button class="btn btn-primary" id="doctorSendButton" disabled>Send</button></form></div>
         </div>
       </section>
@@ -151,59 +151,134 @@ table{width:100%;border-collapse:collapse;min-width:620px}th,td{text-align:left;
    Never place a service_role key or database password in this file. */
 const SUPABASE_URL = "https://qpmwklyinjlfiubaabse.supabase.co";
 const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFwbXdrbHlpbmpsZml1YmFhYnNlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTQ2NTc3MjksImV4cCI6MjExMDIzMzcyOX0.H88XAMBPYAOSAYszwEqkiS8SViiDXUt8aegrKySbFaU";
+const db=(window.supabase&&window.supabase.createClient)?window.supabase.createClient(SUPABASE_URL,SUPABASE_ANON_KEY,{auth:{persistSession:false,autoRefreshToken:false,detectSessionInUrl:false}}):null;
 
-const supabaseReady = !!(window.supabase && SUPABASE_URL && SUPABASE_ANON_KEY);
-const db = supabaseReady ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
-  auth:{ persistSession:true, autoRefreshToken:true, detectSessionInUrl:true }
-}) : null;
+const $=id=>document.getElementById(id);
+const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+function toast(m){const el=$("toast");el.textContent=m;el.classList.remove("hidden");clearTimeout(window.toastTimer);window.toastTimer=setTimeout(()=>el.classList.add("hidden"),3500)}
+const fmt=t=>new Date(t).toLocaleString([], {day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'});
+const CLINIC_NAME="Clinic team";
 
-const $ = (id)=>document.getElementById(id);
-function toast(message){
-  const el=$("toast"); el.textContent=message; el.classList.remove("hidden");
-  clearTimeout(window.toastTimer); window.toastTimer=setTimeout(()=>el.classList.add("hidden"),3500);
-}
-// ---------------- SECURE DOCTOR–PATIENT MESSAGING ----------------
-let doctorActiveConversation=null,doctorChatChannel=null;
-const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const state={astronauts:[],messages:[],requests:[],active:null,seen:new Set(),first:true,sending:false,channel:null,loading:false};
 
-function doctorChatStatus(message,isError=false){const el=$('doctorChatStatus');if(el){el.textContent=message;el.style.color=isError?'#fca5a5':'var(--muted)';}}
-async function initDoctorMessaging(){
- if(!db||!window.doctorUser)return;
- await loadDoctorConversations();
- if(doctorChatChannel)await db.removeChannel(doctorChatChannel);
- doctorChatChannel=db.channel('doctor-care-'+window.doctorUser.id)
-  .on('postgres_changes',{event:'*',schema:'public',table:'care_messages'},payload=>{
-    if(doctorActiveConversation&&payload.new?.conversation_id===doctorActiveConversation.id)loadDoctorMessages(doctorActiveConversation.id);
-    loadDoctorConversations();
-  }).subscribe();
- doctorChatStatus('Secure messaging connected.');
+function setConn(ok,msg){
+  const c=document.querySelector('.connection');
+  $("connectionText").textContent=ok?"Live":"Offline";
+  c.style.color=ok?"var(--green)":"var(--amber)";
+  $("noticeConn").textContent=ok?"Live connection active":"Not connected";
+  $("reqBadge").textContent=ok?"Live":"Offline";$("reqBadge").className="badge "+(ok?"badge-green":"badge-amber");
+  if(msg||ok)chatStatus(ok?"Connected. New messages appear instantly.":msg,!ok);
 }
-async function loadDoctorConversations(){
- if(!db||!window.doctorUser)return;
- const box=$('doctorConversationList');const {data,error}=await db.from('care_conversations').select('id,patient_id,status,updated_at').eq('doctor_id',window.doctorUser.id).order('updated_at',{ascending:false});
- if(error){box.innerHTML='<div class="empty">Conversations could not be loaded.</div>';doctorChatStatus(error.message,true);return;}
- if(!data?.length){box.innerHTML='<div class="empty">No patient conversations have been started.</div>';return;}
- box.innerHTML=data.map(c=>`<button class="btn-quiet" style="text-align:left;padding:12px;border-radius:10px" data-cid="${esc(c.id)}" data-pid="${esc(c.patient_id)}"><strong>Patient conversation</strong><br><span class="small muted">${esc(String(c.patient_id).slice(0,8))}… · ${new Date(c.updated_at).toLocaleString()}</span></button>`).join('');
+function chatStatus(m,isErr){const el=$("doctorChatStatus");el.textContent=m;el.style.color=isErr?"#fca5a5":"var(--muted)"}
+function hint(err){const m=(err&&err.message)||"";return /does not exist|schema cache|relation/i.test(m)?"The database is not set up yet. Run astrocare_database_setup.sql in Supabase.":(m||"Could not reach the database.")}
+
+const nameOf=id=>(state.astronauts.find(a=>a.id===id)||{}).name||id;
+const threadOf=id=>state.messages.filter(m=>m.astronaut_id===id);
+const unreadOf=id=>threadOf(id).filter(m=>m.sender==="astronaut"&&!m.read_at).length;
+
+async function loadAll(manual){
+  if(state.loading)return; state.loading=true;
+  try{
+    if(!db){setConn(false,"Could not load the connection library. Check your internet and reload.");return}
+    const [a,m,r]=await Promise.all([
+      db.from("portal_astronauts").select("id,name,role,updated_at").order("name"),
+      db.from("portal_messages").select("id,astronaut_id,sender,sender_name,body,created_at,read_at").order("created_at",{ascending:true}).limit(3000),
+      db.from("portal_requests").select("id,astronaut_id,astronaut_name,category,onset,contact,details,status,created_at").order("created_at",{ascending:false}).limit(300)]);
+    const err=a.error||m.error||r.error;
+    if(err){setConn(false,hint(err));renderAll();return}
+    const incoming=m.data.filter(x=>x.sender==="astronaut"&&!state.seen.has(x.id));
+    const newReq=r.data.filter(x=>!state.requests.some(y=>y.id===x.id));
+    if(!state.first){
+      if(incoming.length)toast("New message from "+nameOf(incoming[incoming.length-1].astronaut_id));
+      else if(newReq.length)toast("New medical request from "+(newReq[0].astronaut_name||newReq[0].astronaut_id));
+    }
+    m.data.forEach(x=>state.seen.add(x.id)); state.first=false;
+    state.astronauts=a.data; state.messages=m.data; state.requests=r.data;
+    setConn(true); renderAll(); if(manual)toast("Overview refreshed");
+  }catch(e){setConn(false,e.message)}
+  finally{state.loading=false}
 }
-async function openDoctorConversation(id,patientId){doctorActiveConversation={id};$('doctorChatTitle').textContent='Patient '+patientId.slice(0,8)+'…';$('doctorChatState').textContent='Open';$('doctorMessageInput').disabled=false;$('doctorSendButton').disabled=false;await loadDoctorMessages(id);}
-async function loadDoctorMessages(id){
- const box=$('doctorMessages');const {data,error}=await db.from('care_messages').select('id,sender_id,body,created_at,read_at').eq('conversation_id',id).order('created_at',{ascending:true});
- if(error){box.innerHTML='<div class="empty">Messages could not be loaded.</div>';doctorChatStatus(error.message,true);return;}
- box.innerHTML=data?.length?data.map(m=>`<div class="message ${m.sender_id===window.doctorUser.id?'mine':''}">${String(m.body).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}<small>${m.sender_id===window.doctorUser.id?'You':'Patient'} · ${new Date(m.created_at).toLocaleString()}</small></div>`).join(''):'<div class="empty">No messages yet.</div>';
- box.scrollTop=box.scrollHeight;
- if(data?.some(m=>m.sender_id!==window.doctorUser.id&&!m.read_at))await db.rpc('astrocare_mark_messages_read',{p_conversation_id:id});
+
+function renderAll(){renderDashboard();renderDirectory();renderRequests();renderConversations();renderThread()}
+
+function statusBadge(s){return s==="resolved"?'<span class="badge badge-green">Resolved</span>':s==="reviewing"?'<span class="badge badge-blue">Reviewing</span>':'<span class="badge badge-amber">New</span>'}
+
+function renderDashboard(){
+  const unread=state.messages.filter(m=>m.sender==="astronaut"&&!m.read_at).length;
+  $("stAstro").textContent=state.astronauts.length;
+  $("stPending").textContent=state.requests.filter(r=>r.status!=="resolved").length;
+  $("stUnread").textContent=unread;
+  $("stResolved").textContent=state.requests.filter(r=>r.status==="resolved").length;
+  const open=state.requests.filter(r=>r.status!=="resolved").slice(0,5);
+  $("dashRequests").innerHTML=open.length?open.map(r=>`<div class="list-row"><div class="person"><div class="avatar">${esc((r.astronaut_name||r.astronaut_id||"?").slice(0,1).toUpperCase())}</div><div><strong>${esc(r.astronaut_name||r.astronaut_id)} · ${esc(r.category||"Medical request")}</strong><span>${esc(r.details.slice(0,70))}${r.details.length>70?"…":""} · ${fmt(r.created_at)}</span></div></div>${statusBadge(r.status)}</div>`).join(""):'<div class="empty">No open requests.</div>';
 }
-$('doctorMessageForm').addEventListener('submit',async e=>{
- e.preventDefault();if(!doctorActiveConversation)return;const input=$('doctorMessageInput'),body=input.value.trim();if(!body)return;const btn=$('doctorSendButton');btn.disabled=true;
- try{const {error}=await db.from('care_messages').insert({conversation_id:doctorActiveConversation.id,sender_id:window.doctorUser.id,body});if(error)throw error;input.value='';await loadDoctorMessages(doctorActiveConversation.id);await loadDoctorConversations();}
- catch(err){doctorChatStatus('Message not sent: '+err.message,true);}finally{btn.disabled=false;}
+
+function renderDirectory(){
+  const q=($("astronautSearch").value||"").toLowerCase();
+  const list=state.astronauts.filter(a=>[a.name,a.id,a.role].join(" ").toLowerCase().includes(q));
+  $("astroList").innerHTML=list.length?list.map(a=>{
+    const u=unreadOf(a.id),open=state.requests.filter(r=>r.astronaut_id===a.id&&r.status!=="resolved").length;
+    return `<div class="list-row"><div class="person"><div class="avatar">${esc((a.name||"?").split(/\s+/).map(x=>x[0]).join("").slice(0,2).toUpperCase())}</div><div><strong>${esc(a.name)}</strong><span>${esc(a.id)} · ${esc(a.role||"Crew member")} · ${open} open request${open===1?"":"s"}</span></div></div><div style="display:flex;gap:8px;align-items:center">${u?`<span class="badge badge-red">${u} unread</span>`:""}<button class="btn btn-quiet" data-chat="${esc(a.id)}">Message</button></div></div>`}).join(""):`<div class="empty">${state.astronauts.length?"No astronauts match your search.":"No astronauts yet. They appear when they open the astronaut app."}</div>`;
+}
+
+function renderRequests(){
+  $("reqList").innerHTML=state.requests.length?state.requests.map(r=>`<div class="list-row" style="align-items:flex-start;flex-wrap:wrap"><div class="person" style="align-items:flex-start;flex:1;min-width:220px"><div class="avatar">${esc((r.astronaut_name||r.astronaut_id||"?").slice(0,1).toUpperCase())}</div><div><strong>${esc(r.astronaut_name||r.astronaut_id)} · ${esc(r.category||"Medical request")}</strong><span style="white-space:pre-wrap">${esc(r.details)}</span><span>${esc(r.astronaut_id)} · began: ${esc(r.onset||"not stated")} · prefers: ${esc(r.contact||"not stated")} · ${fmt(r.created_at)}</span></div></div><div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">${statusBadge(r.status)}<button class="btn btn-quiet" data-chat="${esc(r.astronaut_id)}">Message</button>${r.status==="new"?`<button class="btn btn-quiet" data-req="${esc(r.id)}" data-status="reviewing">Start review</button>`:""}${r.status!=="resolved"?`<button class="btn btn-primary" data-req="${esc(r.id)}" data-status="resolved">Mark resolved</button>`:""}</div></div>`).join(""):'<div class="empty">No requests yet.</div>';
+}
+async function setRequestStatus(id,status){
+  const r=state.requests.find(x=>x.id===id);if(!r||!db)return;
+  const {error}=await db.from("portal_requests").update({status}).eq("id",id);
+  if(error){toast("Could not update: "+hint(error));return}
+  r.status=status;renderAll();toast(status==="resolved"?"Request marked resolved":"Review started");
+}
+
+/* ---------- live messaging ---------- */
+function renderConversations(){
+  const ids=new Set(state.astronauts.map(a=>a.id));state.messages.forEach(m=>ids.add(m.astronaut_id));
+  const rows=[...ids].map(id=>{const t=threadOf(id),last=t[t.length-1];return{id,last,unread:unreadOf(id)}})
+    .sort((x,y)=>(y.last?new Date(y.last.created_at):0)-(x.last?new Date(x.last.created_at):0));
+  $("doctorConversationList").innerHTML=rows.length?rows.map(r=>`<button class="btn-quiet" data-chat="${esc(r.id)}" style="text-align:left;padding:12px;border-radius:10px;display:flex;justify-content:space-between;align-items:center;gap:10px;${state.active===r.id?"border-color:var(--blue)":""}"><span style="min-width:0"><strong>${esc(nameOf(r.id))}</strong><br><span class="small muted">${r.last?esc((r.last.sender==="doctor"?"You: ":"")+r.last.body.slice(0,36)):"No messages yet"}</span></span>${r.unread?`<span class="badge badge-red">${r.unread}</span>`:""}</button>`).join(""):'<div class="empty">No astronauts yet. They appear when they open the astronaut app.</div>';
+}
+function openConversation(id){
+  state.active=id;navigate("communications");
+  $("doctorMessageInput").disabled=false;$("doctorSendButton").disabled=false;
+  renderConversations();renderThread(true);$("doctorMessageInput").focus();
+}
+function renderThread(stick){
+  const id=state.active;
+  if(!id){return}
+  $("doctorChatTitle").textContent=nameOf(id);$("doctorChatState").textContent="Live";$("doctorChatState").className="badge badge-green";
+  const box=$("doctorMessages"),near=box.scrollHeight-box.scrollTop-box.clientHeight<80,t=threadOf(id);
+  box.innerHTML=t.length?t.map(m=>`<div class="message ${m.sender==="doctor"?"mine":""}">${esc(m.body)}<small>${m.sender==="doctor"?esc(m.sender_name||"You"):esc(nameOf(id))} · ${fmt(m.created_at)}${m.sender==="doctor"&&m.read_at?" · Read":""}</small></div>`).join(""):'<div class="empty">No messages yet. Say hello below.</div>';
+  if(stick||near)box.scrollTop=box.scrollHeight;
+  markRead(id);
+}
+async function markRead(id){
+  if(!db||$("page-communications").classList.contains("hidden"))return;
+  const un=threadOf(id).filter(m=>m.sender==="astronaut"&&!m.read_at);if(!un.length)return;
+  const now=new Date().toISOString();un.forEach(m=>m.read_at=now);
+  renderDashboard();renderDirectory();renderConversations();
+  await db.from("portal_messages").update({read_at:now}).eq("astronaut_id",id).eq("sender","astronaut").is("read_at",null);
+}
+$("doctorMessageForm").addEventListener("submit",async e=>{
+  e.preventDefault();if(!state.active||state.sending||!db)return;
+  const input=$("doctorMessageInput"),body=input.value.trim();if(!body)return;
+  state.sending=true;$("doctorSendButton").disabled=true;
+  try{
+    const {data,error}=await db.from("portal_messages").insert({astronaut_id:state.active,sender:"doctor",sender_name:CLINIC_NAME,body}).select("id,astronaut_id,sender,sender_name,body,created_at,read_at").single();
+    if(error)throw error;
+    input.value="";state.seen.add(data.id);if(!state.messages.some(m=>m.id===data.id))state.messages.push(data);
+    renderThread(true);renderConversations();setConn(true);
+  }catch(err){chatStatus("Message not sent: "+hint(err),true);toast("Message not sent. Your text is still in the box.")}
+  finally{state.sending=false;$("doctorSendButton").disabled=false}
 });
-$('refreshDoctorChats').addEventListener('click',loadDoctorConversations);
-$('doctorConversationList').addEventListener('click',e=>{const b=e.target.closest('[data-cid]');if(b)openDoctorConversation(b.dataset.cid,b.dataset.pid)});
+$("refreshDoctorChats").addEventListener("click",()=>loadAll(true));
 
-// No sign-in: the portal opens directly. Patient messaging needs a signed-in account, so it stays unavailable.
-$("doctorConversationList").innerHTML='<div class="empty">Patient conversations are not available because no doctor account is connected.</div>';
-doctorChatStatus('Messaging is unavailable until a doctor account is connected.');
+/* ---------- navigation and events ---------- */
+document.addEventListener("click",e=>{
+  const c=e.target.closest("[data-chat]");if(c){openConversation(c.dataset.chat);return}
+  const r=e.target.closest("[data-req]");if(r){setRequestStatus(r.dataset.req,r.dataset.status)}
+});
+$("astronautSearch").addEventListener("input",renderDirectory);
 document.querySelectorAll(".nav-btn").forEach(btn=>btn.addEventListener("click",()=>navigate(btn.dataset.page)));
 document.querySelectorAll("[data-goto]").forEach(btn=>btn.addEventListener("click",()=>navigate(btn.dataset.goto)));
 function navigate(page){
@@ -211,7 +286,24 @@ function navigate(page){
   $("page-"+page)?.classList.remove("hidden");
   document.querySelectorAll(".nav-btn").forEach(b=>b.classList.toggle("active",b.dataset.page===page));
   window.scrollTo(0,0);
+  if(page==="communications"&&state.active)markRead(state.active);
 }
+
+function subscribe(){
+  if(!db)return;
+  if(state.channel){db.removeChannel(state.channel);state.channel=null}
+  let t;const bump=()=>{clearTimeout(t);t=setTimeout(()=>loadAll(),250)};
+  state.channel=db.channel("clinic-"+Date.now())
+    .on("postgres_changes",{event:"*",schema:"public",table:"portal_messages"},bump)
+    .on("postgres_changes",{event:"*",schema:"public",table:"portal_requests"},bump)
+    .on("postgres_changes",{event:"*",schema:"public",table:"portal_astronauts"},bump)
+    .subscribe();
+}
+(async()=>{await loadAll();subscribe()})();
+setInterval(()=>{if(!document.hidden)loadAll()},8000);
+document.addEventListener("visibilitychange",()=>{if(!document.hidden)loadAll()});
+window.addEventListener("online",()=>loadAll());
+window.addEventListener("offline",()=>setConn(false,"You are offline"));
 </script>
 </body>
 </html>
