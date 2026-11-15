@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#0b1220">
+<title>AstroCare Medical Centre | Doctor Portal</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.0"></script>
+<style>
+:root{
+  --bg:#0b1220;--panel:#121d2d;--panel2:#172438;--line:#26364b;
+  --text:#eef4fb;--muted:#91a3b8;--blue:#38bdf8;--cyan:#06b6d4;
+  --green:#10b981;--amber:#f59e0b;--red:#ef4444;--purple:#a78bfa;
+  --shadow:0 18px 50px rgba(0,0,0,.22);--radius:16px
+}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font-family:Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif}
+button,input,textarea,select{font:inherit}button{cursor:pointer}
+.hidden{display:none!important}
+.brand-mark{width:48px;height:48px;border-radius:14px;background:linear-gradient(135deg,#0ea5e9,#06b6d4);display:grid;place-items:center;font-size:23px;margin-bottom:20px}
+.eyebrow{color:var(--cyan);font-size:11px;font-weight:800;letter-spacing:1.7px;text-transform:uppercase}
+h1,h2,h3,p{margin-top:0}h1{font-size:25px;margin-bottom:8px}h2{font-size:21px}h3{font-size:15px}
+.muted{color:var(--muted)}.small{font-size:12px;line-height:1.6}
+.field{display:grid;gap:7px;margin:16px 0}.field label{font-size:12px;color:#b8c7d8;font-weight:700}
+.field input,.field textarea,.field select{width:100%;background:#0b1524;color:var(--text);border:1px solid var(--line);border-radius:10px;padding:12px 13px;outline:none}
+.field input:focus,.field textarea:focus{border-color:var(--blue);box-shadow:0 0 0 3px rgba(56,189,248,.1)}
+.btn{border:0;border-radius:10px;padding:11px 15px;font-weight:750;transition:.15s}
+.btn-primary{background:var(--blue);color:#062033}.btn-primary:hover{filter:brightness(1.08)}
+.btn-quiet{background:#203149;color:#dce9f7;border:1px solid #31445d}
+.btn-danger{background:rgba(239,68,68,.13);color:#fca5a5;border:1px solid rgba(239,68,68,.3)}
+.btn-block{width:100%;margin-top:8px}
+.notice{padding:12px 13px;border:1px solid rgba(245,158,11,.28);background:rgba(245,158,11,.08);color:#fbd38d;border-radius:10px;font-size:12px;line-height:1.55;margin-top:16px}
+.error{color:#fca5a5;font-size:12px;margin-top:12px;line-height:1.5}
+#app{min-height:100vh}.topbar{height:68px;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;padding:0 25px;background:#0d1726;position:sticky;top:0;z-index:5}
+.topbrand{display:flex;align-items:center;gap:12px;font-weight:800}.mini-mark{width:36px;height:36px;border-radius:11px;background:linear-gradient(135deg,#0ea5e9,#06b6d4);display:grid;place-items:center}
+.top-actions{display:flex;align-items:center;gap:12px}.connection{font-size:11px;color:var(--green);display:flex;align-items:center;gap:7px}.dot{width:7px;height:7px;border-radius:50%;background:currentColor}
+.layout{display:grid;grid-template-columns:240px minmax(0,1fr);min-height:calc(100vh - 68px)}
+.sidebar{border-right:1px solid var(--line);padding:22px 14px;background:#0d1726}
+.side-label{font-size:10px;color:#6f8299;font-weight:800;letter-spacing:1.5px;padding:12px 12px 8px}
+.nav-btn{width:100%;display:flex;align-items:center;gap:12px;border:0;background:transparent;color:#9fb0c4;padding:11px 12px;border-radius:10px;text-align:left;margin:2px 0;font-size:13px;font-weight:650}
+.nav-btn:hover,.nav-btn.active{background:#1a2b40;color:#eaf6ff}.nav-btn.active{box-shadow:inset 3px 0 var(--blue)}
+.nav-icon{width:20px;text-align:center;font-size:16px}
+.sidebar-bottom{margin-top:35px;padding:13px;border:1px solid var(--line);border-radius:12px;background:#111e30}
+.main{padding:28px;max-width:1500px;width:100%;margin:0 auto}
+.page-head{display:flex;justify-content:space-between;align-items:flex-start;gap:16px;margin-bottom:24px}
+.page-head h1{font-size:25px;margin:5px 0 7px}.page-head p{color:var(--muted);font-size:13px;margin:0}
+.grid{display:grid;gap:16px}.stats{grid-template-columns:repeat(4,minmax(0,1fr));margin-bottom:20px}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);padding:18px;box-shadow:var(--shadow)}
+.stat-top{display:flex;justify-content:space-between;align-items:center;color:var(--muted);font-size:12px}
+.stat-value{font-size:29px;font-weight:800;margin:12px 0 5px}.stat-note{font-size:11px;color:var(--muted)}
+.stat-icon{width:36px;height:36px;border-radius:11px;display:grid;place-items:center;background:#1d334b}
+.two-col{grid-template-columns:minmax(0,1.4fr) minmax(280px,.9fr)}
+.section-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:15px}.section-head h2{font-size:15px;margin:0}
+.list{display:grid;gap:10px}.list-row{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px;border:1px solid #26374c;border-radius:12px;background:#142136}
+.person{display:flex;align-items:center;gap:11px;min-width:0}.avatar{width:38px;height:38px;border-radius:12px;background:#25415b;color:#c7efff;display:grid;place-items:center;font-weight:800;flex:none}
+.person strong{font-size:12px;display:block}.person span{font-size:11px;color:var(--muted);display:block;margin-top:4px}
+.badge{font-size:10px;font-weight:800;padding:5px 8px;border-radius:30px;white-space:nowrap}
+.badge-red{background:rgba(239,68,68,.14);color:#fca5a5}.badge-amber{background:rgba(245,158,11,.14);color:#fcd38a}.badge-green{background:rgba(16,185,129,.14);color:#6ee7b7}.badge-blue{background:rgba(56,189,248,.14);color:#7dd3fc}
+.table-wrap{overflow:auto;border:1px solid var(--line);border-radius:12px}
+table{width:100%;border-collapse:collapse;min-width:620px}th,td{text-align:left;padding:13px 14px;border-bottom:1px solid var(--line);font-size:12px}th{color:#8fa3ba;font-size:10px;letter-spacing:1px;text-transform:uppercase;background:#101b2b}td{color:#dce7f3}tr:last-child td{border-bottom:0}
+.search{max-width:280px;background:#0c1727;border:1px solid var(--line);border-radius:10px;padding:10px 12px;color:var(--text)}
+.empty{padding:28px;text-align:center;color:var(--muted);font-size:12px;border:1px dashed #34465c;border-radius:12px}
+.messages{display:flex;flex-direction:column;gap:10px;padding:12px 0;overflow:auto}
+.message{max-width:82%;padding:10px 12px;border-radius:12px;background:#1b2b40;font-size:12px;line-height:1.5;overflow-wrap:anywhere}
+.message.mine{align-self:flex-end;background:#075b86}
+.message small{display:block;color:#c1d1df;margin-top:5px;font-size:9px}
+.chat-compose{display:flex;gap:8px;border-top:1px solid var(--line);padding-top:12px}
+.chat-compose input{flex:1;min-width:0}
+.callout{border:1px solid rgba(56,189,248,.25);background:rgba(56,189,248,.07);padding:14px;border-radius:12px;font-size:12px;color:#c5eaff;line-height:1.6}
+.kv{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}.kv div{padding:13px;background:#142136;border:1px solid var(--line);border-radius:11px}.kv span{display:block;color:var(--muted);font-size:10px}.kv strong{display:block;margin-top:7px;font-size:13px}
+#toast{position:fixed;right:22px;bottom:22px;background:#17314a;border:1px solid #31506c;color:#e7f7ff;padding:12px 16px;border-radius:11px;font-size:12px;z-index:20;box-shadow:var(--shadow)}
+.footer-note{font-size:10px;color:#73869d;margin-top:18px;line-height:1.6}
+@media(max-width:1000px){.stats{grid-template-columns:repeat(2,1fr)}.two-col{grid-template-columns:minmax(0,1fr)}}
+@media(max-width:720px){.topbar{padding:0 14px}.topbrand span:last-child{font-size:12px}.connection{display:none}.layout{grid-template-columns:minmax(0,1fr)}.sidebar{display:flex;overflow:auto;padding:9px;border-right:0;border-bottom:1px solid var(--line);gap:4px}.side-label,.sidebar-bottom{display:none}.nav-btn{width:auto;white-space:nowrap;padding:10px}.main{padding:19px 14px}.stats{gap:10px}.card{padding:14px}.page-head{display:block}.page-head .btn{margin-top:14px}.kv{grid-template-columns:1fr}}
+@media(max-width:390px){.stats{grid-template-columns:1fr 1fr}.stat-value{font-size:24px}}
+</style>
+</head>
+<body>
+
+<div id="app">
+  <header class="topbar">
+    <div class="topbrand"><div class="mini-mark">✚</div><span>ASTROCARE</span><span class="muted">MEDICAL CENTRE</span></div>
+    <div class="top-actions"><span class="connection"><i class="dot"></i><span id="connectionText">Connecting…</span></span><span id="doctorLabel" class="small muted">Admin clinic</span></div>
+  </header>
+  <div class="layout">
+    <aside class="sidebar">
+      <div class="side-label">WORKSPACE</div>
+      <button class="nav-btn active" data-page="dashboard"><span class="nav-icon">▦</span>Overview</button>
+      <button class="nav-btn" data-page="astronauts"><span class="nav-icon">♙</span>Astronaut directory</button>
+      <button class="nav-btn" data-page="requests"><span class="nav-icon">✚</span>Medical requests</button>
+      <button class="nav-btn" data-page="communications"><span class="nav-icon">▤</span>Communications</button>
+      <button class="nav-btn" data-page="monitoring"><span class="nav-icon">⌁</span>Health monitoring</button>
+      <button class="nav-btn" data-page="records"><span class="nav-icon">▣</span>Medical records</button>
+      <button class="nav-btn" data-page="reports"><span class="nav-icon">▥</span>Mission reports</button>
+      <div class="sidebar-bottom"><div class="eyebrow">MISSION HEALTH</div><p class="small muted" style="margin:8px 0 0">Review incoming requests and reply to astronauts live. Urgent cases should also follow the mission's established emergency protocol.</p></div>
+    </aside>
+    <main class="main">
+      <section id="page-dashboard" class="page">
+        <div class="page-head"><div><div class="eyebrow">CLINICAL WORKSPACE</div><h1>Doctor overview</h1><p>Mission health activity and items requiring clinical review.</p></div><button class="btn btn-quiet" onclick="loadAll(true)">↻ Refresh overview</button></div>
+        <div class="grid stats">
+          <div class="card"><div class="stat-top">Astronauts <span class="stat-icon">♙</span></div><div class="stat-value" id="stAstro">—</div><div class="stat-note">Registered from the astronaut app</div></div>
+          <div class="card"><div class="stat-top">Pending requests <span class="stat-icon">✚</span></div><div class="stat-value" id="stPending">—</div><div class="stat-note">New or being reviewed</div></div>
+          <div class="card"><div class="stat-top">Unread messages <span class="stat-icon">▤</span></div><div class="stat-value" id="stUnread">—</div><div class="stat-note">From astronauts</div></div>
+          <div class="card"><div class="stat-top">Resolved requests <span class="stat-icon">✓</span></div><div class="stat-value" id="stResolved">—</div><div class="stat-note">Closed by the clinic</div></div>
+        </div>
+        <div class="grid two-col">
+          <div class="card"><div class="section-head"><h2>Incoming medical requests</h2><button class="btn btn-quiet" data-goto="requests">View all</button></div><div id="dashRequests" class="list"><div class="empty">Loading…</div></div></div>
+          <div class="card"><div class="section-head"><h2>Clinical notices</h2><span class="badge badge-blue">System</span></div><div class="list"><div class="list-row"><div class="person"><div class="avatar">●</div><div><strong id="noticeConn">Connecting…</strong><span>Messages and requests from astronauts arrive here live.</span></div></div></div><div class="list-row"><div class="person"><div class="avatar">↗</div><div><strong>Communication limitations</strong><span>Deep-space messages may be delayed.</span></div></div></div><div class="list-row"><div class="person"><div class="avatar">✓</div><div><strong>Data policy</strong><span>Only information sent by astronauts is shown. Nothing is made up.</span></div></div></div></div></div>
+        </div>
+        <p class="footer-note">This portal is a decision-support interface, not a diagnostic device or substitute for professional clinical judgement.</p>
+      </section>
+
+      <section id="page-astronauts" class="page hidden">
+        <div class="page-head"><div><div class="eyebrow">PATIENT ACCESS</div><h1>Astronaut directory</h1><p>Astronauts appear here once they open the astronaut app.</p></div><input class="search" id="astronautSearch" placeholder="Search astronaut directory…"></div>
+        <div class="card"><div id="astroList" class="list"><div class="empty">Loading…</div></div></div>
+      </section>
+
+      <section id="page-requests" class="page hidden">
+        <div class="page-head"><div><div class="eyebrow">TRIAGE WORKSPACE</div><h1>Medical requests</h1><p>Requests sent by astronauts from the Medical Triage page.</p></div><span class="badge badge-amber" id="reqBadge">Connecting…</span></div>
+        <div class="card"><div id="reqList" class="list"><div class="empty">Loading…</div></div></div>
+      </section>
+
+      <section id="page-communications" class="page hidden">
+        <div class="page-head"><div><div class="eyebrow">SECURE MESSAGING</div><h1>Communications</h1><p>Doctor–astronaut conversations, delivery states and message history.</p></div></div>
+        <div class="grid two-col">
+          <div class="card"><div class="section-head"><h2>Patient conversations</h2><button class="btn btn-quiet" id="refreshDoctorChats">Refresh</button></div><div id="doctorConversationList" class="list"><div class="empty">Loading conversations…</div></div><p id="doctorChatStatus" class="footer-note" role="status">Connecting…</p></div>
+          <div class="card"><div class="section-head"><h2 id="doctorChatTitle">Conversation</h2><span class="badge badge-amber" id="doctorChatState">Not selected</span></div><div id="doctorMessages" class="messages" style="min-height:270px;max-height:420px;overflow:auto"><div class="empty">Select a patient conversation.</div></div><form id="doctorMessageForm" class="chat-compose"><input id="doctorMessageInput" maxlength="4000" placeholder="Write a secure message…" disabled><button class="btn btn-primary" id="doctorSendButton" disabled>Send</button></form></div>
+        </div>
+      </section>
+
+      <section id="page-monitoring" class="page hidden">
+        <div class="page-head"><div><div class="eyebrow">SHARED HEALTH DATA</div><h1>Health monitoring</h1><p>Review authorised vital-sign observations and trends.</p></div></div>
+        <div class="card"><div class="empty">No live health observations are loaded. Only verified, timestamped data shared with your doctor account will appear here.</div></div>
+      </section>
+
+      <section id="page-records" class="page hidden">
+        <div class="page-head"><div><div class="eyebrow">CLINICAL DOCUMENTATION</div><h1>Medical records</h1><p>Access and document records according to patient permissions and mission policy.</p></div></div>
+        <div class="card"><div class="empty">Medical-record access is not connected yet. Record creation and editing will be enabled only after field-level permissions are implemented.</div></div>
+      </section>
+
+      <section id="page-reports" class="page hidden">
+        <div class="page-head"><div><div class="eyebrow">MISSION DOCUMENTATION</div><h1>Mission reports</h1><p>Review authorised mission health summaries and clinical reports.</p></div></div>
+        <div class="card"><div class="empty">No reports loaded. Report generation will be connected after the data model and access rules are verified.</div></div>
+      </section>
+    </main>
+  </div>
+</div>
+<div id="toast" class="hidden" role="status"></div>
+
+<script>
+/* Public Supabase project settings. The anon key is intended for browser use.
+   Never place a service_role key or database password in this file. */
+const SUPABASE_URL = "https://qpmwklyinjlfiubaabse.supabase.co";
+const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFwbXdrbHlpbmpsZml1YmFhYnNlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTQ2NTc3MjksImV4cCI6MjExMDIzMzcyOX0.H88XAMBPYAOSAYszwEqkiS8SViiDXUt8aegrKySbFaU";
+const db=(window.supabase&&window.supabase.createClient)?window.supabase.createClient(SUPABASE_URL,SUPABASE_ANON_KEY,{auth:{persistSession:false,autoRefreshToken:false,detectSessionInUrl:false}}):null;
+
+const $=id=>document.getElementById(id);
+const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+function toast(m){const el=$("toast");el.textContent=m;el.classList.remove("hidden");clearTimeout(window.toastTimer);window.toastTimer=setTimeout(()=>el.classList.add("hidden"),3500)}
+const fmt=t=>new Date(t).toLocaleString([], {day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'});
+const CLINIC_NAME="Clinic team";
+
+const state={astronauts:[],messages:[],requests:[],active:null,seen:new Set(),first:true,sending:false,channel:null,loading:false};
+
+function setConn(ok,msg){
+  const c=document.querySelector('.connection');
+  $("connectionText").textContent=ok?"Live":"Offline";
+  c.style.color=ok?"var(--green)":"var(--amber)";
+  $("noticeConn").textContent=ok?"Live connection active":"Not connected";
+  $("reqBadge").textContent=ok?"Live":"Offline";$("reqBadge").className="badge "+(ok?"badge-green":"badge-amber");
+  if(msg||ok)chatStatus(ok?"Connected. New messages appear instantly.":msg,!ok);
+}
+function chatStatus(m,isErr){const el=$("doctorChatStatus");el.textContent=m;el.style.color=isErr?"#fca5a5":"var(--muted)"}
+function hint(err){const m=(err&&err.message)||"";return /does not exist|schema cache|relation/i.test(m)?"The database is not set up yet. Run astrocare_database_setup.sql in Supabase.":(m||"Could not reach the database.")}
+
+const nameOf=id=>(state.astronauts.find(a=>a.id===id)||{}).name||id;
+const threadOf=id=>state.messages.filter(m=>m.astronaut_id===id);
+const unreadOf=id=>threadOf(id).filter(m=>m.sender==="astronaut"&&!m.read_at).length;
+
+async function loadAll(manual){
+  if(state.loading)return; state.loading=true;
+  try{
+    if(!db){setConn(false,"Could not load the connection library. Check your internet and reload.");return}
+    const [a,m,r]=await Promise.all([
+      db.from("portal_astronauts").select("id,name,role,updated_at").order("name"),
+      db.from("portal_messages").select("id,astronaut_id,sender,sender_name,body,created_at,read_at").order("created_at",{ascending:true}).limit(3000),
+      db.from("portal_requests").select("id,astronaut_id,astronaut_name,category,onset,contact,details,status,created_at").order("created_at",{ascending:false}).limit(300)]);
+    const err=a.error||m.error||r.error;
+    if(err){setConn(false,hint(err));renderAll();return}
+    const incoming=m.data.filter(x=>x.sender==="astronaut"&&!state.seen.has(x.id));
+    const newReq=r.data.filter(x=>!state.requests.some(y=>y.id===x.id));
+    if(!state.first){
+      if(incoming.length)toast("New message from "+nameOf(incoming[incoming.length-1].astronaut_id));
+      else if(newReq.length)toast("New medical request from "+(newReq[0].astronaut_name||newReq[0].astronaut_id));
+    }
+    m.data.forEach(x=>state.seen.add(x.id)); state.first=false;
+    state.astronauts=a.data; state.messages=m.data; state.requests=r.data;
+    setConn(true); renderAll(); if(manual)toast("Overview refreshed");
+  }catch(e){setConn(false,e.message)}
+  finally{state.loading=false}
+}
+
+function renderAll(){renderDashboard();renderDirectory();renderRequests();renderConversations();renderThread()}
+
+function statusBadge(s){return s==="resolved"?'<span class="badge badge-green">Resolved</span>':s==="reviewing"?'<span class="badge badge-blue">Reviewing</span>':'<span class="badge badge-amber">New</span>'}
+
+function renderDashboard(){
+  const unread=state.messages.filter(m=>m.sender==="astronaut"&&!m.read_at).length;
+  $("stAstro").textContent=state.astronauts.length;
+  $("stPending").textContent=state.requests.filter(r=>r.status!=="resolved").length;
+  $("stUnread").textContent=unread;
+  $("stResolved").textContent=state.requests.filter(r=>r.status==="resolved").length;
+  const open=state.requests.filter(r=>r.status!=="resolved").slice(0,5);
+  $("dashRequests").innerHTML=open.length?open.map(r=>`<div class="list-row"><div class="person"><div class="avatar">${esc((r.astronaut_name||r.astronaut_id||"?").slice(0,1).toUpperCase())}</div><div><strong>${esc(r.astronaut_name||r.astronaut_id)} · ${esc(r.category||"Medical request")}</strong><span>${esc(r.details.slice(0,70))}${r.details.length>70?"…":""} · ${fmt(r.created_at)}</span></div></div>${statusBadge(r.status)}</div>`).join(""):'<div class="empty">No open requests.</div>';
+}
+
+function renderDirectory(){
+  const q=($("astronautSearch").value||"").toLowerCase();
+  const list=state.astronauts.filter(a=>[a.name,a.id,a.role].join(" ").toLowerCase().includes(q));
+  $("astroList").innerHTML=list.length?list.map(a=>{
+    const u=unreadOf(a.id),open=state.requests.filter(r=>r.astronaut_id===a.id&&r.status!=="resolved").length;
+    return `<div class="list-row"><div class="person"><div class="avatar">${esc((a.name||"?").split(/\s+/).map(x=>x[0]).join("").slice(0,2).toUpperCase())}</div><div><strong>${esc(a.name)}</strong><span>${esc(a.id)} · ${esc(a.role||"Crew member")} · ${open} open request${open===1?"":"s"}</span></div></div><div style="display:flex;gap:8px;align-items:center">${u?`<span class="badge badge-red">${u} unread</span>`:""}<button class="btn btn-quiet" data-chat="${esc(a.id)}">Message</button></div></div>`}).join(""):`<div class="empty">${state.astronauts.length?"No astronauts match your search.":"No astronauts yet. They appear when they open the astronaut app."}</div>`;
+}
+
+function renderRequests(){
+  $("reqList").innerHTML=state.requests.length?state.requests.map(r=>`<div class="list-row" style="align-items:flex-start;flex-wrap:wrap"><div class="person" style="align-items:flex-start;flex:1;min-width:220px"><div class="avatar">${esc((r.astronaut_name||r.astronaut_id||"?").slice(0,1).toUpperCase())}</div><div><strong>${esc(r.astronaut_name||r.astronaut_id)} · ${esc(r.category||"Medical request")}</strong><span style="white-space:pre-wrap">${esc(r.details)}</span><span>${esc(r.astronaut_id)} · began: ${esc(r.onset||"not stated")} · prefers: ${esc(r.contact||"not stated")} · ${fmt(r.created_at)}</span></div></div><div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">${statusBadge(r.status)}<button class="btn btn-quiet" data-chat="${esc(r.astronaut_id)}">Message</button>${r.status==="new"?`<button class="btn btn-quiet" data-req="${esc(r.id)}" data-status="reviewing">Start review</button>`:""}${r.status!=="resolved"?`<button class="btn btn-primary" data-req="${esc(r.id)}" data-status="resolved">Mark resolved</button>`:""}</div></div>`).join(""):'<div class="empty">No requests yet.</div>';
+}
+async function setRequestStatus(id,status){
+  const r=state.requests.find(x=>x.id===id);if(!r||!db)return;
+  const {error}=await db.from("portal_requests").update({status}).eq("id",id);
+  if(error){toast("Could not update: "+hint(error));return}
+  r.status=status;renderAll();toast(status==="resolved"?"Request marked resolved":"Review started");
+}
+
+/* ---------- live messaging ---------- */
+function renderConversations(){
+  const ids=new Set(state.astronauts.map(a=>a.id));state.messages.forEach(m=>ids.add(m.astronaut_id));
+  const rows=[...ids].map(id=>{const t=threadOf(id),last=t[t.length-1];return{id,last,unread:unreadOf(id)}})
+    .sort((x,y)=>(y.last?new Date(y.last.created_at):0)-(x.last?new Date(x.last.created_at):0));
+  $("doctorConversationList").innerHTML=rows.length?rows.map(r=>`<button class="btn-quiet" data-chat="${esc(r.id)}" style="text-align:left;padding:12px;border-radius:10px;display:flex;justify-content:space-between;align-items:center;gap:10px;${state.active===r.id?"border-color:var(--blue)":""}"><span style="min-width:0"><strong>${esc(nameOf(r.id))}</strong><br><span class="small muted">${r.last?esc((r.last.sender==="doctor"?"You: ":"")+r.last.body.slice(0,36)):"No messages yet"}</span></span>${r.unread?`<span class="badge badge-red">${r.unread}</span>`:""}</button>`).join(""):'<div class="empty">No astronauts yet. They appear when they open the astronaut app.</div>';
+}
+function openConversation(id){
+  state.active=id;navigate("communications");
+  $("doctorMessageInput").disabled=false;$("doctorSendButton").disabled=false;
+  renderConversations();renderThread(true);$("doctorMessageInput").focus();
+}
+function renderThread(stick){
+  const id=state.active;
+  if(!id){return}
+  $("doctorChatTitle").textContent=nameOf(id);$("doctorChatState").textContent="Live";$("doctorChatState").className="badge badge-green";
+  const box=$("doctorMessages"),near=box.scrollHeight-box.scrollTop-box.clientHeight<80,t=threadOf(id);
+  box.innerHTML=t.length?t.map(m=>`<div class="message ${m.sender==="doctor"?"mine":""}">${esc(m.body)}<small>${m.sender==="doctor"?esc(m.sender_name||"You"):esc(nameOf(id))} · ${fmt(m.created_at)}${m.sender==="doctor"&&m.read_at?" · Read":""}</small></div>`).join(""):'<div class="empty">No messages yet. Say hello below.</div>';
+  if(stick||near)box.scrollTop=box.scrollHeight;
+  markRead(id);
+}
+async function markRead(id){
+  if(!db||$("page-communications").classList.contains("hidden"))return;
+  const un=threadOf(id).filter(m=>m.sender==="astronaut"&&!m.read_at);if(!un.length)return;
+  const now=new Date().toISOString();un.forEach(m=>m.read_at=now);
+  renderDashboard();renderDirectory();renderConversations();
+  await db.from("portal_messages").update({read_at:now}).eq("astronaut_id",id).eq("sender","astronaut").is("read_at",null);
+}
+$("doctorMessageForm").addEventListener("submit",async e=>{
+  e.preventDefault();if(!state.active||state.sending||!db)return;
+  const input=$("doctorMessageInput"),body=input.value.trim();if(!body)return;
+  state.sending=true;$("doctorSendButton").disabled=true;
+  try{
+    const {data,error}=await db.from("portal_messages").insert({astronaut_id:state.active,sender:"doctor",sender_name:CLINIC_NAME,body}).select("id,astronaut_id,sender,sender_name,body,created_at,read_at").single();
+    if(error)throw error;
+    input.value="";state.seen.add(data.id);if(!state.messages.some(m=>m.id===data.id))state.messages.push(data);
+    renderThread(true);renderConversations();setConn(true);
+  }catch(err){chatStatus("Message not sent: "+hint(err),true);toast("Message not sent. Your text is still in the box.")}
+  finally{state.sending=false;$("doctorSendButton").disabled=false}
+});
+$("refreshDoctorChats").addEventListener("click",()=>loadAll(true));
+
+/* ---------- navigation and events ---------- */
+document.addEventListener("click",e=>{
+  const c=e.target.closest("[data-chat]");if(c){openConversation(c.dataset.chat);return}
+  const r=e.target.closest("[data-req]");if(r){setRequestStatus(r.dataset.req,r.dataset.status)}
+});
+$("astronautSearch").addEventListener("input",renderDirectory);
+document.querySelectorAll(".nav-btn").forEach(btn=>btn.addEventListener("click",()=>navigate(btn.dataset.page)));
+document.querySelectorAll("[data-goto]").forEach(btn=>btn.addEventListener("click",()=>navigate(btn.dataset.goto)));
+function navigate(page){
+  document.querySelectorAll(".page").forEach(p=>p.classList.add("hidden"));
+  $("page-"+page)?.classList.remove("hidden");
+  document.querySelectorAll(".nav-btn").forEach(b=>b.classList.toggle("active",b.dataset.page===page));
+  window.scrollTo(0,0);
+  if(page==="communications"&&state.active)markRead(state.active);
+}
+
+function subscribe(){
+  if(!db)return;
+  if(state.channel){db.removeChannel(state.channel);state.channel=null}
+  let t;const bump=()=>{clearTimeout(t);t=setTimeout(()=>loadAll(),250)};
+  state.channel=db.channel("clinic-"+Date.now())
+    .on("postgres_changes",{event:"*",schema:"public",table:"portal_messages"},bump)
+    .on("postgres_changes",{event:"*",schema:"public",table:"portal_requests"},bump)
+    .on("postgres_changes",{event:"*",schema:"public",table:"portal_astronauts"},bump)
+    .subscribe();
+}
+(async()=>{await loadAll();subscribe()})();
+setInterval(()=>{if(!document.hidden)loadAll()},8000);
+document.addEventListener("visibilitychange",()=>{if(!document.hidden)loadAll()});
+window.addEventListener("online",()=>loadAll());
+window.addEventListener("offline",()=>setConn(false,"You are offline"));
+</script>
+</body>
+</html>
